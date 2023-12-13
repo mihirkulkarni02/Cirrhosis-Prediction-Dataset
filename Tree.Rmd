@@ -1,0 +1,326 @@
+---
+title: "Tree-based"
+author: "Mihir Kulkarni"
+date: "2023-12-12"
+output: html_document
+---
+
+### Explain tree model
+
+
+### Pre-processing the data
+
+```{r}
+#Combine C and CL status into one variable and binarize
+cirrhosis$Status <- ifelse(cirrhosis$Status == "C" | cirrhosis$Status == "CL", 1, 0)
+```
+
+# Split the data sets into training and testing
+
+```{r}
+#Set up the data
+
+# Wrangle the Graduate data to set up training and testing datasets
+modelCirrhosis <- cirrhosis %>%
+  #drop_na() %>%
+  mutate(
+    tempID = row_number(),
+    .before = Status
+  )
+
+## Set seed for reproducibility and slice ----
+set.seed(380)
+trainingData <- modelCirrhosis %>%
+  group_by(Status) %>%
+  slice_sample(prop = 0.8)
+
+testingData <- modelCirrhosis %>%
+  filter(!(tempID %in% trainingData$tempID))
+```
+
+### Grow tree via rpart
+
+```{r}
+# Grow Graduate tree via rpart package
+rPartStatus <- rpart(
+  formula = Status ~ N_Days + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
+  #Lost Triglycerides + 
+  data = trainingData,
+  method = "class",
+  parms = list(split = "information")
+  # We did not need to use the control parameters
+)
+
+```
+
+### Plot tree
+
+```{r}
+# Display rpart.plot ----
+# library(rpart.plot)
+rpart.plot(
+  x = rPartStatus,
+  type = 2,
+  extra = 101
+)
+```
+
+
+### Plot tree
+
+
+```{r}
+# Using the rattle package to visualize the tree ----
+fancyRpartPlot(
+  model = rPartStatus,
+  main = NULL,
+  sub = NULL
+)
+```
+
+
+### Plot cpTable
+
+```{r}
+invisible(capture.output({cpTable <- printcp(rPartStatus)}))
+
+kable(
+  x = cpTable,
+  col.names = c("CP", "Num. of splits", "Rel. Error",
+                "Mean Error", "Std. Deviation of Error"),
+  digits = 3,
+  booktabs = TRUE,
+  align = "c",
+  table.attr = 'data-quarto-disable-processing="true"'
+)
+```
+
+
+### Plot cp visualization
+
+```{r}
+plotcp(
+  x = rPartStatus,
+  minline = TRUE,
+  upper = "size"
+)
+```
+
+
+### Prune tree
+
+```{r}
+# Prune the rpart Graduate Tree ----
+rPartStatus2 <- prune(
+  tree = rPartStatus,
+  cp = 0.016
+)
+```
+
+
+### Plot pruned tree
+
+```{r}
+fancyRpartPlot(
+  model = rPartStatus2,
+  main = NULL,
+  sub = NULL
+)
+```
+
+### Predictions
+
+
+```{r}
+pred_StatusRpart2 <- predict(
+  object = rPartStatus2,
+  newdata = testingData,
+  type = "prob"
+)
+
+# Data Wrangling the predictions ----
+StatusPrediction <- data.frame(
+  rpart2_non_death = pred_StatusRpart2[, 1],
+  rpart2_death = pred_StatusRpart2[, 2]
+) %>%
+  mutate(
+    rpart2_pred = ifelse(
+      test = rpart2_death > rpart2_non_death,
+      yes = 1,
+      no = 0
+    )
+  )
+
+## Set predictions as factors
+StatusPrediction$rpart2_pred <- as.factor(StatusPrediction$rpart2_pred)
+
+# Merge supervision column into predictions data frame ----
+StatusPrediction <- cbind(
+  tempID = testingData$tempID,
+  Status = testingData$Status,
+  StatusPrediction
+)
+```
+
+```{r}
+StatusPrediction$Status <- factor(StatusPrediction$Status)
+
+# Build confusion matrix for second tree model
+conf_matrix <- conf_mat(
+  data = StatusPrediction,
+  truth = Status,
+  estimate = rpart2_pred
+)$table
+
+kable(
+  conf_matrix,
+  col.names = c("Prediction/Supervision", "0", "1"),
+  digits = 3,
+  booktabs = TRUE,
+  caption = "Model 1: Confusion Matrix",
+  align = "c"
+) %>%
+kable_styling(latex_options = "HOLD_position")
+
+
+accuracy <- accuracy(StatusPrediction, Status, rpart2_pred)
+specificity <- specificity(StatusPrediction, Status, rpart2_pred)
+sensitivity <- sensitivity(StatusPrediction, Status, rpart2_pred)
+```
+```{r}
+# Build a data frame with model metrics ----
+StatusPreds <- StatusPrediction %>%
+  dplyr::select(tempID, Status, contains("_pred")) %>%
+  pivot_longer(
+    cols = !c(tempID, Status),
+    names_to = "model",
+    values_to = "prediction"
+  )
+
+accuracy <- StatusPreds %>%
+  group_by(model) %>%
+  accuracy(
+    truth = Status,
+    estimate = prediction
+  )
+
+sensitivity <- StatusPreds %>%
+  group_by(model) %>%
+  sensitivity(
+    truth = Status,
+    estimate = prediction,
+    event_level = "second"
+  )
+
+specificity <- StatusPreds %>%
+  group_by(model) %>%
+  specificity(
+    truth = Status,
+    estimate = prediction,
+    event_level = "second"
+  )
+
+modelMetrics <- bind_rows(
+  accuracy,
+  sensitivity,
+  specificity
+)
+```
+```{r}
+# Make a nice looking table of model metrics ----
+modelMetrics %>%
+  dplyr::select(model, .metric, .estimate) %>%
+  pivot_wider(
+    id_cols = model,
+    names_from = .metric,
+    values_from = .estimate
+  ) %>%
+  kable(
+    digits = 3,
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  )
+```
+
+```{r}
+#Set up the data
+
+# Wrangle the Graduate data to set up training and testing datasets
+modelCirrhosis2 <- cirrhosis %>%
+  drop_na() %>%
+  mutate(
+    tempID = row_number(),
+    .before = Status
+  )
+
+## Set seed for reproducibility and slice ----
+set.seed(380)
+trainingData <- modelCirrhosis2 %>%
+  group_by(Status) %>%
+  slice_sample(prop = 0.8)
+
+testingData <- modelCirrhosis2 %>%
+  filter(!(tempID %in% trainingData$tempID))
+```
+
+
+# Comparison with logistic regression
+
+```{r}
+# Lower bound (Intercept only)
+lower <- glm(
+  formula = Status ~ 1,
+  data = trainingData,
+  family = binomial
+)
+
+# Upper bound 
+upper <- glm(
+  formula = Status ~ N_Days + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
+  data = trainingData,
+  family = binomial
+)
+
+# Stepwise search
+model2 <- step(
+  object = lower,
+  scope = list(
+    lower = lower,
+    upper = upper
+  ),
+  data = trainingData,
+  direction = "both",
+  k = 2
+)
+trainingResults <- trainingData
+```
+
+```{r}
+# Store the predicted and actual values for Model 3:
+trainingResults$model2Pred <- predict(model2, type = "response")
+trainingResults$model2Class <- ifelse(trainingResults$model2Pred > 0.5, 1, 0)
+trainingResults$Actual <- ifelse(trainingData$Status == 1, 1, 0)
+
+# Create confusion matrix using table()
+confusionMatrix <- table(Predicted = trainingResults$model2Class, Actual = trainingResults$Actual)
+
+# Print and format confusion matrix
+kable(confusionMatrix, booktabs = TRUE, align = "c")%>%kable_styling(latex_options = "HOLD_position")
+```
+
+```{r}
+accuracy <- (confusionMatrix[1, 1] + confusionMatrix[0, 0]) / sum(confusionMatrix)
+sensitivity <- confusionMatrix[1, 1] / (confusionMatrix[1, 1] + confusionMatrix[0, 1])
+specificity <- confusionMatrix[0, 0] / (confusionMatrix[0, 0] + confusionMatrix[1, 0])
+
+metrics_df <- data.frame(
+  Metric = c("Accuracy", "Sensitivity", "Specificity"),
+  Value = c(accuracy, sensitivity, specificity)
+)
+
+# Use kable to create the table
+kable(metrics_df, format = "html", caption = "Model Performance Metrics")
+```
+
+

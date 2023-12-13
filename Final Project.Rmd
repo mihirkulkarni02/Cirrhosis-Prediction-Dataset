@@ -1,0 +1,53 @@
+---
+title: "Project #4: Final Project Report: An exploration of Cirrhosis"
+output: html_notebook
+---
+
+
+- Set the stage–explain the context you’re trying to learn something about. MUST ANSWER: Why is this important to you?
+
+we're both interested in the health applications of AI and found an interesting article about cirrhosis and machine learning. We wanted to see if we could replicate the results and learn more about the disease.
+
+- Explain the data provenance–Answer the Who, What, When, Where, Why, and How questions for the origin of the data. Include any additional information that would be useful in understanding the context in which the data are embedded.
+
+- Data Preprocessing
+
+```{r}
+#load in the data
+library(tidyverse)
+#load data
+cirrhosis <- read_csv("cirrhosis.csv")
+head(cirrhosis)
+```
+
+
+# Pre-process the data
+```{r}
+#encode the sex, ascites, hepatomegaly, spiders, edema into binary variables
+cirrhosis$Sex <- ifelse(cirrhosis$Sex == "F", 0, 1)
+cirrhosis$Ascites <- ifelse(cirrhosis$Ascites == "Y", 1, 0)
+cirrhosis$Hepatomegaly <- ifelse(cirrhosis$Hepatomegaly == "Y", 1, 0)
+cirrhosis$Spiders <- ifelse(cirrhosis$Spiders == "Y", 1, 0)
+#factorize the stage
+cirrhosis$Stage <- factor(cirrhosis$Stage)
+cirrhosis$Status <- factor(cirrhosis$Status)
+#need to do more
+#Drop the first column
+cirrhosis <- cirrhosis[,-1]
+```
+
+- Engage in Exploratory Data Analysis
+
+- Use Machine Learning Algorithms:
+  - You must use at least one of each: a Regression-based algorithm, a Tree-based algorithm, and an Unsupervised Learning algorithm.
+  - Each algorithm must be explained for a general audience.
+  - All results should be explained.
+  - Where appropriate, comparisons between methods should be discussed. This includes highlighting the strengths and weaknesses of the various approaches as well as when each is appropriate.
+  
+- A discussion of what you’ve learned from your work about the context and recommendations for future work.
+
+- Author Contributions–list out who did what in the project.
+
+- References–Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
+
+- A commented Code Appendix
