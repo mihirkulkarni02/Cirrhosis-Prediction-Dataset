@@ -377,3 +377,5 @@ metrics_df <- data.frame(
 # Use kable to create the table
 kable(metrics_df, format = "html", caption = "Model Performance Metrics")
 ```
+
+## Discussion
