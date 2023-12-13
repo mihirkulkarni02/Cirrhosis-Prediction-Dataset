@@ -53,3 +53,11 @@ cirrhosis <- cirrhosis[,-1]
 - References–Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
 
 - A commented Code Appendix
+
+```{r}
+
+cirrhosis %>% 
+  ggplot(aes(x = N_Days)) + geom_histogram() +
+  facet_wrap(facets = vars(Status))
+
+```
