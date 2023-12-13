@@ -5,15 +5,19 @@ date: "2023-12-12"
 output: html_document
 ---
 
+# Part II: Prediction for the Number of Days until an event (death)
 
-```{r}
-count <- colSums(is.na(cirrhosis))
+Next, let us address our next sub-goal: predicting the number of days a patient survives. The objective is to use the medical test data help doctors make better decisions. To do this, we will be using linear regression.
 
-kable(count)
-```
-##### Splitting:
+## Introduction
 
-we'll split the dataset into training and testing sets. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing.
+Linear regression is a statistical technique to model the relationship between a dependent variable and one or more independent variables. The model tries to draw a straight line that best fits the data points on a graph, representing how changes in the independent variables are associated with changes in the dependent variable. The primary advantage of linear regression is its simplicity and ease of interpretation. However, its main drawbacks are that it assumes a linear relationship between variables, which may not always be true. This type of model can be very sensitive to outliers, which affects the model's accuracy, especially dealing with medical data. Furthermore, unlike the decision tree, linear regression models cannot ignore N/A values.
+
+![[Linear Regression Example (]{.underline}[Source](https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-linear-regression/))](LinRegEg.png)
+
+## Methodology
+
+Similar to the tree, we will start by splitting the data set into training and testing sets. Note that the data now onluy contains instances where the patient was deceased. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing. To allow reproducible code, we have fixed the seed at 380.
 
 ```{r}
 cirrhosisLRData <- cirrhosis %>%
@@ -22,9 +26,8 @@ cirrhosisLRData <- cirrhosis %>%
 
 cirrhosisLRData <- cirrhosisLRData[, -2] #Remove status column
 
-#cirrhosisLRData <- na.omit(cirrhosisLRData)
 
-set.seed(123)  #reproducibility
+set.seed(380)  #reproducibility
 
 # Sampling 80% 
 train_data <- cirrhosisLRData %>% sample_frac(0.8)
@@ -34,9 +37,10 @@ test_data <- setdiff(cirrhosisLRData, train_data)
 
 ```
 
-##### Test out basic model
+### Step 1: Train basic tree
+
 ```{r}
-LRModel1 <- lm( #train the insurance model
+LRModel1 <- lm( #train the basic tree
   formula = N_Days ~ Platelets,
   data = test_data,
   na.action = "na.omit"
@@ -45,11 +49,11 @@ LRModel1 <- lm( #train the insurance model
 summary(LRModel1)
 ```
 
-##### Define the models
+### Step 2: Train basic models
 
-- fullModel predicts N_Days using all variables from the train_data 
-- interceptModel uses only the intercept from the non-missing data
-- initialModel uses only the intercept from the entire dataset.
+-   fullModel predicts N_Days using all variables from the train_data
+-   interceptModel uses only the intercept from the non-missing data
+-   initialModel uses only the intercept from the entire dataset.
 
 ```{r}
 fullModel <- lm(
@@ -69,11 +73,12 @@ initialModel <- lm(
 ```
 
 ##### Calculating RMSE for first model
+
 ```{r}
 sqrt(mean(residuals(initialModel)^2, na.rm = TRUE))
 ```
 
-#####Using stepwise regression
+### Step 3: Testing selection models
 
 ```{r}
 stepwiseTrainModel <- step(
@@ -89,14 +94,16 @@ stepwiseTrainModel <- step(
 )
 ```
 
+Here, we will be trying various algorithms to choose the best features/attributes
 
-#### Trying various algorithms to choose the best features/attributes
+#### (a) Backward Selection
 
-##### Backward Selection
-- Backward selection is a method of fitting regression models in which the choice of predictive variables is carried out by an automatic procedure.
-- step() function is employed to perform backward selection. The fullModel is used as the starting model, and variables are iteratively removed until the model reaches the specification of interceptModel, which only contains the intercept. The data used for this selection process omits any rows with missing values. The direction = backward argument specifies the backward elimination method, and k = 2 determines the penalty for adding a variable. Finally, trace = 0 indicates that the intermediate steps of the selection process won't be printed. The final model after backward selection is stored in ModelBS
+-   Backward selection is a method of fitting regression models in which the choice of predictive variables is carried out by an automatic procedure.
+
+-   step() function is employed to perform backward selection. The fullModel is used as the starting model, and variables are iteratively removed until the model reaches the specification of interceptModel, which only contains the intercept. The data used for this selection process omits any rows with missing values. The direction = backward argument specifies the backward elimination method, and k = 2 determines the penalty for adding a variable. Finally, trace = 0 indicates that the intermediate steps of the selection process won't be printed. The final model after backward selection is stored in ModelBS
 
 summary of backward:
+
 ```{r}
 ModelBS <- step(
   object = fullModel,
@@ -114,10 +121,10 @@ ModelBS <- step(
 summary(ModelBS)
 ```
 
-##### Forward Selection
+#### (b) Forward Selection
 
-- Forward selection is a type of stepwise regression which begins with an empty model and adds in variables one by one. In each forward step, you add the one variable that gives the single best improvement to your model.
-- The step() function to perform forward model selection. Starting from a basic model (interceptModel), the function iteratively adds predictors from the fullModel if they improve the model fit based on some criterion (in this case, likely AIC with a penalty factor of 2, given by k = 2). The trace = 0 argument suppresses intermediate output, providing a cleaner console output. This technique helps in identifying the most relevant predictors for a regression model in a data-driven manner.
+-   Forward selection is a type of stepwise regression which begins with an empty model and adds in variables one by one. In each forward step, you add the one variable that gives the single best improvement to your model.
+-   The step() function to perform forward model selection. Starting from a basic model (interceptModel), the function iteratively adds predictors from the fullModel if they improve the model fit based on some criterion (in this case, likely AIC with a penalty factor of 2, given by k = 2). The trace = 0 argument suppresses intermediate output, providing a cleaner console output. This technique helps in identifying the most relevant predictors for a regression model in a data-driven manner.
 
 Summary of foward:
 
@@ -138,11 +145,11 @@ ModelFS <- step(
 summary(ModelFS)
 ```
 
-##### Stepwise
+#### (c) Stepwise
 
-- Stepwise regression is the step-by-step iterative construction of a regression model that involves the selection of independent variables to be used in a final model. It involves adding or removing potential explanatory variables in succession and testing for statistical significance after each iteration.
+-   Stepwise regression is the step-by-step iterative construction of a regression model that involves the selection of independent variables to be used in a final model. It involves adding or removing potential explanatory variables in succession and testing for statistical significance after each iteration.
 
-- the step function conducts stepwise selection for a regression model. Initially, it starts with an interceptModel and evaluates the inclusion or exclusion of predictor variables based on their significance and contribution to the model fit. The scope argument specifies the simplest and most complex models. In this case, the simplest is the interceptModel and the most complex is the fullModel. The selection process can both add and remove predictors based on their importance. The penalty for model complexity is determined by the logarithm of the number of observations.  
+-   the step function conducts stepwise selection for a regression model. Initially, it starts with an interceptModel and evaluates the inclusion or exclusion of predictor variables based on their significance and contribution to the model fit. The scope argument specifies the simplest and most complex models. In this case, the simplest is the interceptModel and the most complex is the fullModel. The selection process can both add and remove predictors based on their importance. The penalty for model complexity is determined by the logarithm of the number of observations.
 
 Summary of stepwise:
 
@@ -169,9 +176,9 @@ summary(ModelSS)
 sqrt(mean(residuals(stepwiseTrainModel)^2, na.rm = TRUE))
 ```
 
+## Step 4: Results
 
-##### Build QQ Plot for the stepwise Train Model
-
+### Build QQ Plot for the stepwise Train Model
 
 ```{r}
 
@@ -188,7 +195,7 @@ car::qqPlot(
 )
 ```
 
-##### Calculate Skewness of Residuals from the Stepwise Training Model
+### Calculate Skewness of Residuals from the Stepwise Training Model
 
 ```{r}
 library(psych)
@@ -196,13 +203,13 @@ library(psych)
 skew(residuals(stepwiseTrainModel))
 ```
 
-##### Sample Excess Kurtosis
+#### Sample Excess Kurtosis
+
 ```{r}
 kurtosi(residuals(stepwiseTrainModel))
 ```
 
-##### Built a plot for the model
-
+#### Built a plot for the model
 
 ```{r}
 ggplot(
@@ -274,7 +281,8 @@ kable(
 
 ```
 
-### PREDICT
+### Predictions
+
 ```{r}
 predictVals <- predict(
   object = stepwiseTrainModel,
@@ -293,9 +301,10 @@ rmse_testing <- sqrt(mean(test_data$residuals^2, na.rm = TRUE))
 rmse_testing
 ```
 
-##### Plot comparing actual charges to predicted charges from the test_data
+### Plot predictions
 
-the blue reference line indicates wher predictions match actual values perfectly.
+the blue reference line indicates where predictions match actual values perfectly.
+
 ```{r}
 ggplot(
   data = test_data,

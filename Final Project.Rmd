@@ -44,6 +44,11 @@ cirrhosis$Edema <- factor(cirrhosis$Edema)
 cirrhosis <- cirrhosis[,-1]
 ```
 
+```{r}
+count <- colSums(is.na(cirrhosis))
+
+kable(count)
+```
 - Engage in Exploratory Data Analysis
 
 - Use Machine Learning Algorithms:
