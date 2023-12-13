@@ -1,6 +1,6 @@
 ---
 title: "Tree-based"
-author: "Mihir Kulkarni"
+author: "Mihir Kulkarni, Nithika Menon"
 date: "2023-12-12"
 output: html_document
 ---
@@ -42,9 +42,9 @@ testingData <- modelCirrhosis %>%
 
 ```{r}
 # Grow Graduate tree via rpart package
+library(rpart)
 rPartStatus <- rpart(
-  formula = Status ~ N_Days + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
-  #Lost Triglycerides + 
+  formula = Status ~ N_Days + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage + Tryglicerides, 
   data = trainingData,
   method = "class",
   parms = list(split = "information")
@@ -57,7 +57,7 @@ rPartStatus <- rpart(
 
 ```{r}
 # Display rpart.plot ----
-# library(rpart.plot)
+ library(rpart.plot)
 rpart.plot(
   x = rPartStatus,
   type = 2,
@@ -71,6 +71,8 @@ rpart.plot(
 
 ```{r}
 # Using the rattle package to visualize the tree ----
+library(rattle)
+
 fancyRpartPlot(
   model = rPartStatus,
   main = NULL,
@@ -83,6 +85,8 @@ fancyRpartPlot(
 
 ```{r}
 invisible(capture.output({cpTable <- printcp(rPartStatus)}))
+
+library(kableExtra)
 
 kable(
   x = cpTable,
@@ -164,6 +168,8 @@ StatusPrediction <- cbind(
 
 ```{r}
 StatusPrediction$Status <- factor(StatusPrediction$Status)
+
+library(yardstick)
 
 # Build confusion matrix for second tree model
 conf_matrix <- conf_mat(

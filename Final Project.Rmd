@@ -6,6 +6,8 @@ hello
 
 - Set the stage–explain the context you’re trying to learn something about. MUST ANSWER: Why is this important to you?
 
+Cirrohosis is a condition where the liver is scarred and permanently damaged. As this condition, chances of liver failure and liver cancer increase. We are intrested in creating model that can predict stages of Cirrohosis and also death based on certain conditions. We hope our work can be useful in catching Cirrosis earlier on. 
+
 we're both interested in the health applications of AI and found an interesting article about cirrhosis and machine learning. We wanted to see if we could replicate the results and learn more about the disease.
 
 - Explain the data provenance–Answer the Who, What, When, Where, Why, and How questions for the origin of the data. Include any additional information that would be useful in understanding the context in which the data are embedded.

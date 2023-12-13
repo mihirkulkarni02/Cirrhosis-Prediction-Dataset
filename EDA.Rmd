@@ -1,6 +1,6 @@
 ---
 title: "EDA"
-author: "Mihir Kulkarni"
+author: "Mihir Kulkarni, Nithika Menon"
 date: "2023-12-12"
 output: html_document
 ---
