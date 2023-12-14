@@ -5,23 +5,50 @@ date: "2023-12-12"
 output: html_document
 ---
 
-### Explain tree model
+# Part I: Classification Algorithm for the Status of the Patient
 
+To address the first sub-goal of this project, we will be exploring the prediction of the status of a patient at the end of the study. Our main objective through this is to gain a stronger understanding of what factors played in the role of the death of the patient. To do this, we will be using Decision Trees. Let us start by exploring what these are and why we chose to use them.
 
-### Pre-processing the data
+## Introduction
+
+Decision trees are a type of model used in statistics for making predictions based on data. They work by breaking down a dataset into smaller subsets through "splits," resembling a tree with branches. Each branch represents a possible decision or outcome, leading to a final prediction or classification.
+
+The main advantages of decision trees include their simplicity and interpretability, as they are easy to visualize and understand. Another important advantage is that they are able to learn with data with N/A values, something alternatives such as Logistic Regression. Considering the limitation we have with our data size and number of N/A values, this an important advantage. However, there are some downsides such as a tendency to overfit the data, which is something we need to be careful about.
+
+![[Decision Tree Example (]{.underline}[Source](https://data-flair.training/blogs/r-decision-trees/))](DecTreeEg.png)
+
+## Pre-processing the data
+
+For this data, we will be dealing with the Status variable. The Status variable was divided into 3 classes:
+
+-   Class 0 (D): The patient didn't survive.
+
+```{=html}
+<!-- -->
+```
+-   Class 1 (C): The patient is censored, meaning that the observation period ended without the death being recorded.
+
+-   Class 2 (CL): Similar to Class 1, the patient is censored due to liver transplantation.
+
+Thus, we can group Class 1 and 2.
 
 ```{r}
 #Combine C and CL status into one variable and binarize
-cirrhosis$Status <- ifelse(cirrhosis$Status == "C" | cirrhosis$Status == "CL", 1, 0)
+cirrhosisTreeData <- cirrhosis
+cirrhosisTreeData$Status <- ifelse(cirrhosisTreeData$Status == "C" | cirrhosisTreeData$Status == "CL", 1, 0)
 ```
 
-# Split the data sets into training and testing
+## Methodology
+
+Our objective is to create a classifier capable of predicting a patient's outcome. To achieve this, we will be testing our data with the cart algorithm. To ensure model validation, we'll be using a 80% training and 20% testing data division. I will also be stratifying the data based on the status.
+
+To guarantee consistency and reproducibility in our results, we have fixed the seed for our 80/20 data split at 380. With these steps, we are now well-positioned to finalize our training and testing data sets.
+
+The predictors in these models will be guided by the results from the EDA. We will also use a variety of tools to understand the model's performance.
 
 ```{r}
-#Set up the data
-
 # Wrangle the Graduate data to set up training and testing datasets
-modelCirrhosis <- cirrhosis %>%
+modelCirrhosis <- cirrhosisTreeData %>%
   #drop_na() %>%
   mutate(
     tempID = row_number(),
@@ -38,13 +65,17 @@ testingData <- modelCirrhosis %>%
   filter(!(tempID %in% trainingData$tempID))
 ```
 
-### Grow tree via rpart
+### Step 1: Growing the tree
+
+There are useful packages to build decision trees in R: the {tree} and the {rpart} (recursive partitioning) packages.
+
+In this report, I have decided to use {rpart} because it provides more flexibility for surrogate splits and the trees are a bit easier to make attractive looking.
 
 ```{r}
 # Grow Graduate tree via rpart package
 library(rpart)
 rPartStatus <- rpart(
-  formula = Status ~ N_Days + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage + Tryglicerides, 
+  formula = Status ~ Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage + Tryglicerides, 
   data = trainingData,
   method = "class",
   parms = list(split = "information")
@@ -53,7 +84,11 @@ rPartStatus <- rpart(
 
 ```
 
-### Plot tree
+### Part 2: Visualizing the tree
+
+With the tree grown, we can now visualize it for an easy understanding of its functioning. This is an important advantage for CART over logistic regression.
+
+The following is a basic diagram for the tree that was just grown.
 
 ```{r}
 # Display rpart.plot ----
@@ -65,9 +100,7 @@ rpart.plot(
 )
 ```
 
-
-### Plot tree
-
+(Explanation of above) To gain a further understanding of the data, we can plot a tree yielding Collection Node style trees. This can help us understand how the data is split.
 
 ```{r}
 # Using the rattle package to visualize the tree ----
@@ -80,8 +113,9 @@ fancyRpartPlot(
 )
 ```
 
+### Part 3: Pruning the tree
 
-### Plot cpTable
+Pruning reduces the size of decision trees by removing parts of the tree that do not provide power to classify instances. The first step of pruning a tree is understanding the complexity parameter used. The complexity parameter (cp) in rpart is the minimum improvement in the model needed at each node. This is used when building the tree. We can see the results based on the cross validation from the table below.
 
 ```{r}
 invisible(capture.output({cpTable <- printcp(rPartStatus)}))
@@ -99,8 +133,7 @@ kable(
 )
 ```
 
-
-### Plot cp visualization
+This can also be visualized in a graph to gain a better understanding of the data. The graph below shows the connection between the cp, size of tree and the x-val relative error.
 
 ```{r}
 plotcp(
@@ -110,8 +143,7 @@ plotcp(
 )
 ```
 
-
-### Prune tree
+From the graph we can see that a cp of 0.011 is ideal as it is under the horizontal (dotted) reference line. We can prune the tree with this CP value.
 
 ```{r}
 # Prune the rpart Graduate Tree ----
@@ -121,8 +153,7 @@ rPartStatus2 <- prune(
 )
 ```
 
-
-### Plot pruned tree
+We can plot the pruned tree
 
 ```{r}
 fancyRpartPlot(
@@ -132,8 +163,11 @@ fancyRpartPlot(
 )
 ```
 
-### Predictions
+### Part 4: Results
 
+Now, we can evaluate the results of the tree on the testing data from the initial 80-20 split. As is true whenever we use validation approaches, we need to test out our model on the testing data set. This will give us a more accurate understanding of how well the model fits the context we're seeking to build our understanding of.
+
+An important part of our results is understanding the role of prediction and inference. In a broad sense, prediction refers to the process of making forecasts about future events or unknown values based on a model while inference generally refers to the process of drawing conclusions from data. For the basic tree, I will be mainly focusing on prediction aspects of the results. However, later in the report, we will also be exploring inference findings.
 
 ```{r}
 pred_StatusRpart2 <- predict(
@@ -166,6 +200,8 @@ StatusPrediction <- cbind(
 )
 ```
 
+We can evaluate the results of this through a confusion matrix.
+
 ```{r}
 StatusPrediction$Status <- factor(StatusPrediction$Status)
 
@@ -193,6 +229,7 @@ accuracy <- accuracy(StatusPrediction, Status, rpart2_pred)
 specificity <- specificity(StatusPrediction, Status, rpart2_pred)
 sensitivity <- sensitivity(StatusPrediction, Status, rpart2_pred)
 ```
+
 ```{r}
 # Build a data frame with model metrics ----
 StatusPreds <- StatusPrediction %>%
@@ -232,6 +269,19 @@ modelMetrics <- bind_rows(
   specificity
 )
 ```
+
+From this, we can get the model's
+
+-   True Positive (TP): Predicted Graduated and actually Graduated. In this case, 2217
+
+-   False Positive (FP): Predicted Graduated but actually Not Graduated. In this case, 1000
+
+-   False Negative (FN): Predicted Not Graduated but actually Graduated. In this case, 244
+
+-   True Negative (TN): Predicted Not Graduated and actually Not Graduated. In this case, 659
+
+With this, we can also calculate the model's metrics.
+
 ```{r}
 # Make a nice looking table of model metrics ----
 modelMetrics %>%
@@ -269,7 +319,6 @@ trainingData <- modelCirrhosis2 %>%
 testingData <- modelCirrhosis2 %>%
   filter(!(tempID %in% trainingData$tempID))
 ```
-
 
 # Comparison with logistic regression
 
@@ -329,4 +378,4 @@ metrics_df <- data.frame(
 kable(metrics_df, format = "html", caption = "Model Performance Metrics")
 ```
 
-
+## Discussion

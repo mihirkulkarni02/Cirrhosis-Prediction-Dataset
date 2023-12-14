@@ -33,11 +33,22 @@ cirrhosis$Spiders <- ifelse(cirrhosis$Spiders == "Y", 1, 0)
 #factorize the stage
 cirrhosis$Stage <- factor(cirrhosis$Stage)
 cirrhosis$Status <- factor(cirrhosis$Status)
+cirrhosis$Drug <- factor(cirrhosis$Drug)
+cirrhosis$Sex <- factor(cirrhosis$Sex)
+cirrhosis$Ascites <- factor(cirrhosis$Ascites)
+cirrhosis$Hepatomegaly <- factor(cirrhosis$Hepatomegaly)
+cirrhosis$Spiders <- factor(cirrhosis$Spiders)
+cirrhosis$Edema <- factor(cirrhosis$Edema)
 #need to do more
 #Drop the first column
 cirrhosis <- cirrhosis[,-1]
 ```
 
+```{r}
+count <- colSums(is.na(cirrhosis))
+
+kable(count)
+```
 - Engage in Exploratory Data Analysis
 
 - Use Machine Learning Algorithms:
