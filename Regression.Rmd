@@ -9,4 +9,25 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+### Dataset for Regression
+```{r}
+cirrhosisRegression <- cirrhosis
+```
+
+
+```{r}
+
+cirrhosisRegression <- cirrhosisRegression %>%
+                                        filter(Status != "D") %>%
+                                                          mutate(Transplant = ifelse(Status == 'C', 0, 1 ))
+
+```
+
+### Logistic regression model
+```{r}
+
+TransplantModel <- glm()
+
+
+```
 
