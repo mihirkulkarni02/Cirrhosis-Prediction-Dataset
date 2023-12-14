@@ -2,29 +2,163 @@
 title: "Unsupervised"
 author: "Mihir Kulkarni"
 date: "2023-12-12"
-output: html_document
+output: html_notebook
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+# Unsupevised Learning
+
+ In this section, we sought to if there are sub-collections of patients. We expect sub-collections to mimic medical definitions of the stages of Biliary Cirrhosis but are curious to see if clustering can reveal some newer observations. 
+
+### Stages of Biliary Cirrhosis
+
+Stage 1: There's inflammation and damange to the walls of medium-sized bile ducts.
+
+Stage 2: There's blockage of the small bile ducts.
+
+Stage 3: This stage marks the beginning of scarring. 
+
+Stage 4: Cirrhosis has developed. This permanent, severe, scarring and damange to the liver.
+
+Source of information: https://www.healthline.com/health/primary-biliary-cirrhosis#stages
+
+
+#do the ml, take about observational stages vs now quantify, look into the different variables and what they mean. 
+
+### Data Wrangling
+```{r}
+
+cirrhosisCluster <- cirrhosis
+
+cirrhosisCluster <- cirrhosisCluster %>%                 
+                                  select(-Stage)     
+                                              
+cirrhosisCluster <- na.omit(cirrhosisCluster) #cannot have NA values in clustering
+
+cirrhosisCluster$Age_Years <- round(cirrhosisCluster$Age_Years) #round age to whole numbers
+
+
+#reode sex... recode others later if need be #female is 0
+
+#cirrhosisCluster  <- cirrhosisCluster %>%
+#  select( -c(Status, Drug, Edema)) %>%
+  
+# mutate(Sex = ifelse(Sex == 'Female', 0, 1))
+     
+      
+  cirrhosisCluster  <- cirrhosisCluster %>%
+    mutate(Sex = ifelse(Sex == 'Female', 0, 1)) %>%
+          mutate(Transplant = ifelse(Status == "CL", 1, 0)) %>%
+              mutate(Status = ifelse(Status %in% c('C', 'CL'), 0 , 1)) %>%
+                    mutate(Drug = ifelse(Drug == "D-penicillamine", 0, 1)) %>%
+                        mutate(EdemaDiurectics = ifelse(Edema %in% c('S', 'Y'), 1, 0)) %>%
+                              mutate(NoEdemaORD = ifelse(Edema == 'N' , 1, 0)) %>%
+                                        mutate(EdemaANDD = ifelse(Edema == "Y", 1, 0)) %>%
+                                                mutate(EdemaORD = ifelse(Edema == "S", 1, 0)) %>%
+                                                                              select(-Edema)
+                                        
+                                    
+                          
+
+#Data is already factored
+     
+#mutate(Sex = ifelse(Sex == 'Female', 0, 1)) %>%
+  
+   #mutate(Status = ifelse(Status %in% c('C', 'CL'), 0 , 1)) %>%
+          #    mutate(Drug = ifelse(Drug == "D-penicillamine", 0, 1))
 ```
 
-## R Markdown
+#make column yes no edema
+#then yes no under treatment
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#same for tranplant stuff
 
-```{r cars}
-summary(cars)
+
+```{r}
+distCirrhosis <- dist(
+  x = cirrhosisCluster,
+  method = "euclidean"
+)
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+### A mixed hierarchial and non-hierarchial 
+
+```{r}
+
+hybridCirrhosis <- hkmeans(
+  x = cirrhosisCluster,
+  k = 4,
+  hc.metric = "euclidean",
+  hc.method = "ward.D",
+  iter.max = 10
+)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+### Visualize Results
+
+
+### Making a color palette
+```{r}
+
+StagesPalette <- c("#AA336A", "#770737", "#40B5AD", "#009E60")
+
+```
+
+
+```{r}
+
+## MAKE A NEW PALLETE TO VISUALIZE
+
+
+
+# Plot the initial dendrogram for hybrid approach ----
+set.seed(380)
+hkmeans_tree(
+  hkmeans = hybridCirrhosis,
+  rect.col = StagesPalette,
+  cex = 0.4,
+  main = "Initial Hierarchical Clusters"
+)
+
+```
+
+```{r}
+# Plot the final dendrogram for hybrid approach ----
+# library(factoextra)
+fviz_dend(
+  x = hybridCirrhosis,
+  cex = 0.4,
+  palette = StagesPalette,
+  rect = FALSE,
+  horiz = TRUE,
+  repel = TRUE,
+  main = "Final Dendrogram"
+)
+
+
+
+```
+
+```{r}
+
+# Plot the final clustering for hybrid approach ----
+# library(factoextra)
+fviz_cluster(
+  object = hybridCirrhosis,
+  stand = FALSE,
+  geom = "point",
+  main = "Hybrid Cluster Plot"
+) +
+  scale_color_manual(values = StagesPalette) +
+  scale_fill_manual(values = StagesPalette) +
+  theme_bw() 
+
+```
+
+

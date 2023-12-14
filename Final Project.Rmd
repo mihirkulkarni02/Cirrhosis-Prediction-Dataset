@@ -11,11 +11,14 @@ authors: "Mihir Kulkarni, Nithika Menon"
 
 Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an autoimmune disease where bile ducts become swollen and inflamed and block the flow of bile. Bile is a substance that aids with digestion. The bile ducts carry bile from the liver to the small intestine. The swelling and inflammation can lead to scarring of the liver which is cirrhosis. Advanced cirrhosis can lead to liver failure or liver cancer. Medication can slow progression. There is no definite cure at this time. 
 
+
+# ASK MIHIR TO PUT IN IMAGES HERE !!!
+
 ## Analysis Objectives
 
 ### Q1: What predictors, if any, increases an individual's chance of receiving a liver transplant?
 
-### Q2: Are there factors that can help distinguish different stages of Biliary Cholangitis not currently included in medical definition?
+### Q2: Are there factors not currently included in medical definition that can help distinguish different stages of Biliary Cholangitis?
 
 
 ## Clinical Study + Dataset Background :
@@ -24,14 +27,22 @@ The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984.
 
 A link to the original study is here: https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf
 
+### Load in Packages
+```{r}
+
+library(survival)
+library(ggplot2)
+library(survival)
+library(survminer)
+library(kableExtra)
+library(factoextra)
+
+```
 
 
 
 
-
-
-- Data Preprocessing
-
+### Data Processing
 ```{r}
 #load in the data
 library(tidyverse)
@@ -41,7 +52,7 @@ head(cirrhosis)
 ```
 
 
-# Pre-process the data
+### Pre-process the data
 ```{r}
 #encode the sex, ascites, hepatomegaly, spiders, edema into binary variables
 cirrhosis$Sex <- ifelse(cirrhosis$Sex == "F", 0, 1)
@@ -53,20 +64,20 @@ cirrhosis$Stage <- factor(cirrhosis$Stage)
 cirrhosis$Status <- factor(cirrhosis$Status)
 cirrhosis$Drug <- factor(cirrhosis$Drug)
 cirrhosis$Sex <- factor(cirrhosis$Sex)
-cirrhosis$Ascites <- factor(cirrhosis$Ascites)
-cirrhosis$Hepatomegaly <- factor(cirrhosis$Hepatomegaly)
-cirrhosis$Spiders <- factor(cirrhosis$Spiders)
+#cirrhosis$Ascites <- factor(cirrhosis$Ascites)
+#cirrhosis$Hepatomegaly <- factor(cirrhosis$Hepatomegaly)
+#cirrhosis$Spiders <- factor(cirrhosis$Spiders)
 cirrhosis$Edema <- factor(cirrhosis$Edema)
-#need to do more
+cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
+
 #Drop the first column
 cirrhosis <- cirrhosis[,-1]
 ```
 
-```{r}
-count <- colSums(is.na(cirrhosis))
 
-kable(count)
-```
+
+
+
 - Engage in Exploratory Data Analysis
 
 - Use Machine Learning Algorithms:
@@ -82,6 +93,7 @@ kable(count)
 - References–Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
 
 - A commented Code Appendix
+
 
 ```{r}
 

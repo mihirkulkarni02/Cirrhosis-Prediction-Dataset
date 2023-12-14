@@ -2,7 +2,7 @@
 title: "EDA"
 author: "Mihir Kulkarni, Nithika Menon"
 date: "2023-12-12"
-output: html_document
+output: html_notebook
 ---
 
 ```{r}
@@ -16,9 +16,113 @@ library(survminer)
 ```
 
 
+# EDA
+
+
+## Exploring the demographics of the patients
+
+
+### Sex Ratio of Patients
+```{r}
+
+#cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
+
+# Preparing the data for pie chart
+sex_data <- cirrhosis %>% 
+            count(Sex) %>% 
+            mutate(Percentage = n / sum(n) * 100)
+
+# Pie Chart
+ggplot(sex_data, aes(x="", y=Percentage, fill=Sex)) +
+    geom_bar(stat="identity", width=1) +
+    coord_polar("y", start=0) +
+    scale_fill_brewer(palette="Pastel1") +
+    theme_minimal() +
+    theme(axis.line = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          plot.title = element_text(size=14, face="bold")) +
+    labs(fill="Sex", title=" Sex Amongst Patients")
+
+
+
+
+```
+Primary Biliary Cholangitis affects women much more than men at a 10-1 ratio. The data of this clinical study mimics the greater population. Investigating gender-based differences in disease progression can uncover any gender-specific patterns in PBC. This could lead to gender-tailored treatment approaches and a better understanding of the disease's biology, which might differ between males and females.
+
+
+### Age Distribution of Patients
+```{r}
+# Converting age from days to years for better readability
+cirrhosis$Age_Years <- cirrhosis$Age / 365.25
+
+# Histogram
+ggplot(cirrhosis, aes(x=Age_Years)) +
+    geom_histogram(binwidth=5, fill="#69b3a2", color="#e9ecef") +
+    theme_minimal() +
+    labs(title="Age Distribution of PBC Patients", x="Age (years)", y="Count") +
+    theme(plot.title = element_text(size=14, face="bold"))
+
+```
+The distribution of ages is quite normal.
+
+
+## Looking at the data itself
+
+
+### NA counts amongst our variables
+```{r}
+count <-  data.frame(NA_CountsPerVar = colSums(is.na(cirrhosis)))
+kable(count)
+```
+An observation is that many of the variables have 106 NAs. This indicates that a good fraction [106 patients] were equally tracked and measured in a less extensive way.
+
+
+
+## Distribution of Stages of Biliary Cholangitis
+```{r}
+
+cirrhosis %>%
+      ggplot(aes(x = Stage)) + geom_bar(fill = "#097969") # need color
+
+```
+This distribution is left skewed and not symmetric. Most patients have stage 3 and then 4 of Biliary Cholangitis. 
+
+## Exploring some interactions of variables
+
+
+### How does prescense of a D-penicillamine with stage of Biliary Cholangitis impact number of days till death?
+```{r}
+
+ggplot(data = cirrhosis, aes (Drug, Stage, fill = N_Days))+ geom_tile() + scale_fill_distiller(palette = "RdPu", trans = "reverse") 
+
+```
+This heat map shows that being a placebo in stage 1 gives you a greater amount of days till death in this sample of patients. 
+
+
+
+### Individuals with Edema, and if they were on the drug
+```{r}
+
+hi = c("#40B5AD", "#009E60", "#9FE2BF")
+library(ggmosaic)
+cirrhosis %>%
+  ggplot() +
+  geom_mosaic(aes( x = product(Edema), fill = Drug)) + scale_fill_manual(values = hi)
+```
+
+Edema is swelling due to too much liquid trapped in the body's tissues. It's common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases. From the graph we can see a even split between the placebo and drug for Edema status. There is no NA values for Edema persistent despite diuretics. We cannot  directly compare it the splits for other statuses given their NA values if known could change the look of the graph. 
+
+
+
+### mihir choose your preffered graph and explain
+
 ### Survival Analysis Based on Treatment and Stage: How does the survival rate differ among patients at different stages of PBC who received D-penicillamine versus placebo?
 
-This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact.
+This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact. (LOLL this is what the study acc sought to discover)
+
+
 
 ```{r}
 surv_object <- Surv(cirrhosis$N_Days, cirrhosis$Status == 'D')
@@ -31,6 +135,11 @@ ggsurvplot(surv_fit,
            ylab = "Survival Probability", 
            title = "Survival Curves by Treatment and Stage")
 ```
+
+
+
+
+
 
 ### Impact of Liver Complications on Survival: How do the presence of ascites, hepatomegaly, and spiders relate to survival time?
 
@@ -53,90 +162,7 @@ This analysis is crucial to understand how different biochemical markers correla
 
 
 
-### Sex Distribution of Patients
-```{r}
-library(ggplot2)
-library(dplyr)
 
-cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
-
-# Preparing the data for pie chart
-sex_data <- cirrhosis %>% 
-            count(Sex) %>% 
-            mutate(Percentage = n / sum(n) * 100)
-
-# Pie Chart
-ggplot(sex_data, aes(x="", y=Percentage, fill=Sex)) +
-    geom_bar(stat="identity", width=1) +
-    coord_polar("y", start=0) +
-    scale_fill_brewer(palette="Pastel1") +
-    theme_minimal() +
-    theme(axis.line = element_blank(),
-          axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid = element_blank(),
-          plot.title = element_text(size=14, face="bold")) +
-    labs(fill="Sex", title="Distribution of Sex in PBC Patients")
-
-```
-Primary Biliary Cholangitis affects women much more than men at a 10-1 ratio. The data of this clinical study mimics the greater population. Investigating gender-based differences in disease progression can uncover any gender-specific patterns in PBC. This could lead to gender-tailored treatment approaches and a better understanding of the disease's biology, which might differ between males and females.
-
-
-
-### Age Distribution of Patients
-
-```{r}
-# Converting age from days to years for better readability
-cirrhosis$Age_Years <- cirrhosis$Age / 365.25
-
-# Histogram
-ggplot(cirrhosis, aes(x=Age_Years)) +
-    geom_histogram(binwidth=5, fill="#69b3a2", color="#e9ecef") +
-    theme_minimal() +
-    labs(title="Age Distribution of PBC Patients", x="Age (years)", y="Count") +
-    theme(plot.title = element_text(size=14, face="bold"))
-
-```
-The distribution of ages is quite normal.
-
-
-### might have to mutate data below to filter out alive ppl but get the gist
-```{r}
-
-ggplot(data = cirrhosis, aes (Drug, Stage, fill = N_Days))  + geom_tile() + scale_fill_distiller(palette = "RdPu") 
-
-```
-
-### Individuals with Edema and if they were on the drug
-```{r}
-
-library(ggmosaic)
-cirrhosis %>%
-  ggplot() +
-  geom_mosaic(aes( x = product(Edema), fill = Drug))
-#ggplot(data = cirrhosis) + geom_mosaic(aes(x = Drug , fill = Status))
-
-```
-Looking at the dist. of stages
-```{r}
-
-cirrhosis %>%
-      ggplot(aes(x = Stage)) + geom_bar() # need color
-
-```
-
-```{r}
-cirrhosis %>%
-      ggplot(aes(x = Cholesterol, y = Bilirubin)) + geom_line()
-
-
-```
-
-
-
-### Comparison of Edema Status on Patient Outcomes
-
-Edema is a common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases.
 
 
 
