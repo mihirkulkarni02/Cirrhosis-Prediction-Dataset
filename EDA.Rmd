@@ -51,22 +51,9 @@ ggsurvplot(surv_fit_complications,
 
 This analysis is crucial to understand how different biochemical markers correlate with the disease's progression. Such correlations can aid in the early detection of disease severity, help in monitoring the disease progression, and potentially guide treatment adjustments.
 
-```{r}
-library(reshape2)
-library(ggplot2)
-cirrhosis_melted <- melt(cirrhosis, id.vars = "Stage", measure.vars = c("Bilirubin", "Cholesterol", "Albumin", "Copper", "Alk_Phos", "SGOT"))
-# Worry about , "Triglycerides" later
-ggplot(cirrhosis_melted, aes(x = Stage, y = value, color = variable)) +
-    geom_point() +
-    scale_color_brewer(palette = "Dark2") +
-    theme_minimal() +
-    labs(title = "Biochemical Markers vs. Disease Stage", x = "Stage", y = "Marker Level")
-```
 
-### Gender Differences in Disease Progression: Is there a difference in the progression of PBC between male and female patients?
 
-First, let us plot the sex distribution
-
+### Sex Distribution of Patients
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -92,23 +79,11 @@ ggplot(sex_data, aes(x="", y=Percentage, fill=Sex)) +
     labs(fill="Sex", title="Distribution of Sex in PBC Patients")
 
 ```
+Primary Biliary Cholangitis affects women much more than men at a 10-1 ratio. The data of this clinical study mimics the greater population. Investigating gender-based differences in disease progression can uncover any gender-specific patterns in PBC. This could lead to gender-tailored treatment approaches and a better understanding of the disease's biology, which might differ between males and females.
 
 
-Investigating gender-based differences in disease progression can uncover any gender-specific patterns in PBC. This could lead to gender-tailored treatment approaches and a better understanding of the disease's biology, which might differ between males and females.
 
-```{r}
-surv_fit_gender <- survfit(surv_object ~ cirrhosis$Sex, data = cirrhosis)
-ggsurvplot(surv_fit_gender, 
-           data = cirrhosis,
-           conf.int = TRUE, 
-           palette = c("#FC4E07", "#2E9FDF"),
-           xlab = "Days", 
-           ylab = "Survival Probability", 
-           title = "Survival Curves by Gender")
-
-```
-
-### Effect of Age at Diagnosis on Survival
+### Age Distribution of Patients
 
 ```{r}
 # Converting age from days to years for better readability
@@ -122,29 +97,46 @@ ggplot(cirrhosis, aes(x=Age_Years)) +
     theme(plot.title = element_text(size=14, face="bold"))
 
 ```
+The distribution of ages is quite normal.
 
-Age at diagnosis is a critical factor in many diseases. This analysis can reveal if younger or older patients have better survival rates, influencing screening practices and early intervention strategies.
+
+### might have to mutate data below to filter out alive ppl but get the gist
+```{r}
+
+ggplot(data = cirrhosis, aes (Drug, Stage, fill = N_Days))  + geom_tile() + scale_fill_distiller(palette = "RdPu") 
+
+```
+
+### Individuals with Edema and if they were on the drug
+```{r}
+
+library(ggmosaic)
+cirrhosis %>%
+  ggplot() +
+  geom_mosaic(aes( x = product(Edema), fill = Drug))
+#ggplot(data = cirrhosis) + geom_mosaic(aes(x = Drug , fill = Status))
+
+```
+Looking at the dist. of stages
+```{r}
+
+cirrhosis %>%
+      ggplot(aes(x = Stage)) + geom_bar() # need color
+
+```
 
 ```{r}
-ggplot(cirrhosis, aes(x = Age, y = N_Days, color = Status)) +
-    geom_point() +
-    scale_color_brewer(palette = "Set1") +
-    theme_minimal() +
-    labs(title = "Age at Diagnosis vs. Survival Time", x = "Age (days)", y = "Survival Time (days)")
+cirrhosis %>%
+      ggplot(aes(x = Cholesterol, y = Bilirubin)) + geom_line()
+
+
 ```
+
+
+
 ### Comparison of Edema Status on Patient Outcomes
 
 Edema is a common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases.
 
-```{r}
-surv_fit_edema <- survfit(surv_object ~ cirrhosis$Edema, data = cirrhosis)
-ggsurvplot(surv_fit_edema, 
-           data = cirrhosis,
-           conf.int = TRUE, 
-           palette = c("#6ACC65", "#E7B800", "#00AFBB"),
-           xlab = "Days", 
-           ylab = "Survival Probability", 
-           title = "Survival Curves by Edema Status")
 
-```
 

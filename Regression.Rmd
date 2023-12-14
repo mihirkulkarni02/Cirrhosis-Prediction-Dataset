@@ -5,6 +5,7 @@ date: "2023-12-12"
 output: html_document
 ---
 
+
 # Part II: Prediction for the Number of Days until an event (death)
 
 Next, let us address our next sub-goal: predicting the number of days a patient survives. The objective is to use the medical test data help doctors make better decisions. To do this, we will be using linear regression.
@@ -37,7 +38,6 @@ test_data <- setdiff(cirrhosisLRData, train_data)
 
 ```
 
-<<<<<<< HEAD
 ### Dataset for Regression
 ```{r}
 cirrhosisRegression <- cirrhosis
@@ -348,4 +348,3 @@ ggplot(
     y = "Predicted"
   )
 ```
->>>>>>> 7ec45acddf7207996704e82ad9213f5f16f1da9a
