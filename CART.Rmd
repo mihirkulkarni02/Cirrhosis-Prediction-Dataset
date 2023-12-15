@@ -27,10 +27,10 @@ For this data, we will be dealing with the Status variable. The Status variable 
 
 -   Class 2 (CL): Similar to Class 1, the patient is censored due to liver transplantation.
 
-
 Thus, we can group Class 1 and 2.
 
 ### Dataset for Tree
+
 ```{r}
 
 cirrhosisTree <- cirrhosis
@@ -38,6 +38,7 @@ cirrhosisTree <- cirrhosis
 ```
 
 ### 
+
 ```{r}
 
 cirrhosisTree <- cirrhosisTree %>%
@@ -45,9 +46,6 @@ cirrhosisTree <- cirrhosisTree %>%
                                                       mutate(Transplant = ifelse(Status == 'C', 0, 1 ))
 
 ```
-
-
-
 
 ## Methodology
 
@@ -374,7 +372,6 @@ confusionMatrix <- table(Predicted = trainingResults$model2Class, Actual = train
 # Print and format confusion matrix
 kable(confusionMatrix, booktabs = TRUE, align = "c")%>%kable_styling(latex_options = "HOLD_position")
 ```
-
 
 ```{r}
 accuracy <- (confusionMatrix[1, 1] + confusionMatrix[0, 0]) / sum(confusionMatrix)

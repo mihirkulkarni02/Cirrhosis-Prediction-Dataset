@@ -7,7 +7,6 @@ output: html_notebook
 
 ```{r}
 #Required libraries
-
 library(survival)
 library(ggplot2)
 library(survival)
@@ -15,14 +14,12 @@ library(survminer)
 
 ```
 
-
 # EDA
-
 
 ## Exploring the demographics of the patients
 
-
 ### Sex Ratio of Patients
+
 ```{r}
 
 #cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
@@ -49,10 +46,11 @@ ggplot(sex_data, aes(x="", y=Percentage, fill=Sex)) +
 
 
 ```
+
 Primary Biliary Cholangitis affects women much more than men at a 10-1 ratio. The data of this clinical study mimics the greater population. Investigating gender-based differences in disease progression can uncover any gender-specific patterns in PBC. This could lead to gender-tailored treatment approaches and a better understanding of the disease's biology, which might differ between males and females.
 
-
 ### Age Distribution of Patients
+
 ```{r}
 # Converting age from days to years for better readability
 cirrhosis$Age_Years <- cirrhosis$Age / 365.25
@@ -65,44 +63,45 @@ ggplot(cirrhosis, aes(x=Age_Years)) +
     theme(plot.title = element_text(size=14, face="bold"))
 
 ```
-The distribution of ages is quite normal.
 
+The distribution of ages is quite normal.
 
 ## Looking at the data itself
 
-
 ### NA counts amongst our variables
+
 ```{r}
 count <-  data.frame(NA_CountsPerVar = colSums(is.na(cirrhosis)))
 kable(count)
 ```
+
 An observation is that many of the variables have 106 NAs. This indicates that a good fraction [106 patients] were equally tracked and measured in a less extensive way.
 
-
-
 ## Distribution of Stages of Biliary Cholangitis
+
 ```{r}
 
 cirrhosis %>%
       ggplot(aes(x = Stage)) + geom_bar(fill = "#097969") # need color
 
 ```
-This distribution is left skewed and not symmetric. Most patients have stage 3 and then 4 of Biliary Cholangitis. 
+
+This distribution is left skewed and not symmetric. Most patients have stage 3 and then 4 of Biliary Cholangitis.
 
 ## Exploring some interactions of variables
 
-
 ### How does prescense of a D-penicillamine with stage of Biliary Cholangitis impact number of days till death?
+
 ```{r}
 
 ggplot(data = cirrhosis, aes (Drug, Stage, fill = N_Days))+ geom_tile() + scale_fill_distiller(palette = "RdPu", trans = "reverse") 
 
 ```
-This heat map shows that being a placebo in stage 1 gives you a greater amount of days till death in this sample of patients. 
 
-
+This heat map shows that being a placebo in stage 1 gives you a greater amount of days till death in this sample of patients.
 
 ### Individuals with Edema, and if they were on the drug
+
 ```{r}
 
 hi = c("#40B5AD", "#009E60", "#9FE2BF")
@@ -112,17 +111,13 @@ cirrhosis %>%
   geom_mosaic(aes( x = product(Edema), fill = Drug)) + scale_fill_manual(values = hi)
 ```
 
-Edema is swelling due to too much liquid trapped in the body's tissues. It's common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases. From the graph we can see a even split between the placebo and drug for Edema status. There is no NA values for Edema persistent despite diuretics. We cannot  directly compare it the splits for other statuses given their NA values if known could change the look of the graph. 
-
-
+Edema is swelling due to too much liquid trapped in the body's tissues. It's common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases. From the graph we can see a even split between the placebo and drug for Edema status. There is no NA values for Edema persistent despite diuretics. We cannot directly compare it the splits for other statuses given their NA values if known could change the look of the graph.
 
 ### mihir choose your preffered graph and explain
 
 ### Survival Analysis Based on Treatment and Stage: How does the survival rate differ among patients at different stages of PBC who received D-penicillamine versus placebo?
 
 This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact. (LOLL this is what the study acc sought to discover)
-
-
 
 ```{r}
 surv_object <- Surv(cirrhosis$N_Days, cirrhosis$Status == 'D')
@@ -135,11 +130,6 @@ ggsurvplot(surv_fit,
            ylab = "Survival Probability", 
            title = "Survival Curves by Treatment and Stage")
 ```
-
-
-
-
-
 
 ### Impact of Liver Complications on Survival: How do the presence of ascites, hepatomegaly, and spiders relate to survival time?
 
@@ -159,10 +149,3 @@ ggsurvplot(surv_fit_complications,
 ### Correlation between Biochemical Markers and Disease Stage: What is the correlation between biochemical markers (Bilirubin, Cholesterol, Albumin, Copper, Alk_Phos, SGOT, Triglycerides) and the histologic stage of the disease?
 
 This analysis is crucial to understand how different biochemical markers correlate with the disease's progression. Such correlations can aid in the early detection of disease severity, help in monitoring the disease progression, and potentially guide treatment adjustments.
-
-
-
-
-
-
-

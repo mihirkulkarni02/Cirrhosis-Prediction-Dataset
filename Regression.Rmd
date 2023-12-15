@@ -5,20 +5,19 @@ date: "2023-12-12"
 output: html_document
 ---
 
+# Part II: Exploring the predictors for a Liver Transplant using logistic regression 
 
-# Part II: Prediction for the Number of Days until an event (death)
-
-Next, let us address our next sub-goal: predicting the number of days a patient survives. The objective is to use the medical test data help doctors make better decisions. To do this, we will be using linear regression.
+Next, let us explore our question with a different type of model. To do this, we will be using (binary) logistic regression model
 
 ## Introduction
 
-Linear regression is a statistical technique to model the relationship between a dependent variable and one or more independent variables. The model tries to draw a straight line that best fits the data points on a graph, representing how changes in the independent variables are associated with changes in the dependent variable. The primary advantage of linear regression is its simplicity and ease of interpretation. However, its main drawbacks are that it assumes a linear relationship between variables, which may not always be true. This type of model can be very sensitive to outliers, which affects the model's accuracy, especially dealing with medical data. Furthermore, unlike the decision tree, linear regression models cannot ignore N/A values.
+Logistic regression is a statistical method used for binary classification, which predicts the probability of an outcome that can be either true or false. This is done by understanding the relationship between a dependent binary variable and one or more independent variables. Logistic regression is easy to implement and interpret. However there are also some drawbacks, the model assumes a linear relationship between the independent variables and the log odds of the dependent variable, which may not always hold true in complex real-world scenarios. Furthermore, unlike the decision tree, linear regression models cannot ignore N/A values.
 
-![[Linear Regression Example (]{.underline}[Source](https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-linear-regression/))](LinRegEg.png)
+![Logistic Regression Model ([Source](https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-logistic-regression/))](46-4.png)
 
 ## Methodology
 
-Similar to the tree, we will start by splitting the data set into training and testing sets. Note that the data now onluy contains instances where the patient was deceased. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing. To allow reproducible code, we have fixed the seed at 380.
+Similar to the tree, we will start by splitting the data set into training and testing sets. Note that the data now only contains instances where the patient was deceased. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing. To allow reproducible code, we have fixed the seed at 380.
 
 ```{r}
 cirrhosisLRData <- cirrhosis %>%
@@ -26,7 +25,6 @@ cirrhosisLRData <- cirrhosis %>%
   drop_na()
 
 cirrhosisLRData <- cirrhosisLRData[, -2] #Remove status column
-
 
 set.seed(380)  #reproducibility
 
@@ -39,10 +37,10 @@ test_data <- setdiff(cirrhosisLRData, train_data)
 ```
 
 ### Dataset for Regression
+
 ```{r}
 cirrhosisRegression <- cirrhosis
 ```
-
 
 ```{r}
 
@@ -53,6 +51,7 @@ cirrhosisRegression <- cirrhosisRegression %>%
 ```
 
 ### Logistic regression model
+
 ```{r}
 
 TransplantModel <- glm()
@@ -60,8 +59,7 @@ TransplantModel <- glm()
 
 ```
 
-=======
-### Step 1: Train basic tree
+======= \### Step 1: Train basic tree
 
 ```{r}
 LRModel1 <- lm( #train the basic tree
