@@ -20,14 +20,8 @@ Logistic regression is a statistical method used for binary classification, whic
 Similar to the tree, we will start by splitting the data set into training and testing sets. Note that the data now only contains instances where the patient was deceased. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing. To allow reproducible code, we have fixed the seed at 380.
 
 ```{r}
-#Set up dataset for regression
 cirrhosisRegression <- cirrhosis
-
-#Remove all rows where the patient status is D
-cirrhosisRegression <- cirrhosisRegression %>%
-                                        filter(Status != "D") %>%
-                                                          mutate(Transplant = ifelse(Status == 'C', 0, 1 ))
-
+cirrhosisRegression$Status <- ifelse(cirrhosisRegression$Status == "C" | cirrhosisRegression$Status == "CL", 1, 0)
 ```
 
 ### Logistic regression model
@@ -38,13 +32,13 @@ LRmodelData <- cirrhosisRegression %>%
   drop_na() %>%
   mutate(
     tempID = row_number(),
-    .before = Transplant
+    .before = Status
   )
 
 # Set seed for reproducibility and slice
 set.seed(380)
 trainingData <- LRmodelData %>%
-  group_by(Transplant) %>%  # group_by() function ensures that the data
+  group_by(Status) %>%  # group_by() function ensures that the data
   slice_sample(prop = 0.75)
 
 testingData <- LRmodelData %>%
@@ -56,7 +50,7 @@ trainingResults <- trainingData
 ```{r}
 # Form Candidate Model 1
 model1 <- glm(
-  formula = Transplant ~ Platelets,
+  formula = Status ~ Platelets,
   data = trainingData,
   family = binomial
 )
@@ -65,14 +59,14 @@ model1 <- glm(
 ```{r models}
 # Lower bound (Intercept only)
 lower <- glm(
-  formula = Transplant ~ 1,
+  formula = Status ~ 1,
   data = trainingData,
   family = binomial
 )
 
 # Upper bound 
 upper <- glm(
-  formula = Transplant ~ Status + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
+  formula = Status ~ Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
   data = trainingData,
   family = binomial
 )
@@ -153,8 +147,8 @@ trainingResults <- trainingResults %>%
 
 #Confusion Matrix for Model 1
 trainingResults %>%
-  mutate(Transplant_status = ifelse(Transplant == 1, 1, 0)) %>%
-  tabyl(var1 = model1Class, var2 = Transplant_status) %>%
+  mutate(Patient_status = ifelse(Status == 1, 1, 0)) %>%
+  tabyl(var1 = model1Class, var2 = Patient_status) %>%
   adorn_title(
     placement = "combined",
     row_name = "Predicted",
@@ -174,7 +168,6 @@ earlier.
 ```{r}
 #Coeff for model 2
 as.data.frame(summary(model2)$coefficients) %>%
-  tail(11) %>%
   rename(coefficient = Estimate) %>% 
   mutate(
     prob_odds = case_when(
@@ -188,7 +181,7 @@ as.data.frame(summary(model2)$coefficients) %>%
 ```
 
 ```{r}
-#do the Tukey-Anscombe plo
+#do the Tukey-Anscombe plot
 ggplot(
   data = data.frame(
     residuals = residuals(model2, type = "pearson"),
@@ -234,7 +227,7 @@ consideration especially when we deal with so many categories.
 #Store the predicted and actual values for Model 2
 trainingResults$model2Pred <- predict(model2, type = "response")
 trainingResults$model2Class <- ifelse(trainingResults$model2Pred > 0.5, 1, 0)
-trainingResults$Actual <- ifelse(trainingData$graduated == 1, 1, 0)
+trainingResults$Actual <- ifelse(trainingData$Status == 1, 1, 0)
 
 # Create confusion matrix using table
 confusionMatrix <- table(Predicted = trainingResults$model2Class, Actual = trainingResults$Actual)
@@ -247,10 +240,12 @@ kable(confusionMatrix, caption = "Confusion matrix for Model 2") %>%
 Lastly, let us look at the separation plots for each of the models.
 
 ```{r}
+library(pROC)
+library(separationplot)
 # Fit ROC Curves for later
 ## Model 1
 model1ROC <- roc(
-  formula = graduated ~ model1Pred,
+  formula = Status ~ model1Pred,
   data = trainingResults
 )
 model1ROC_df <- data.frame(
@@ -261,7 +256,7 @@ model1ROC_df <- data.frame(
 )
 ## Model 2
 model2ROC <- roc(
-  formula = graduated ~ model2Pred,
+  formula = Status ~ model2Pred,
   data = trainingResults
 )
 model2ROC_df <- data.frame(
@@ -392,10 +387,10 @@ naïve decision rule.
 testingData <- testingData %>%
   mutate(
     gradNum = case_when(
-      graduated == 0 ~ 0,
-      graduated == 1 ~ 1
+      Status == 0 ~ 0,
+      Status == 1 ~ 1
     ),
-    .after = graduated
+    .after = Status
   )
 testingData$predict <- predict(
   object = model2,
@@ -412,11 +407,11 @@ testingData <- testingData %>%
 ```
 
 ```{r}
-testingData$graduated <- ifelse(testingData$graduated == 1, 1, 0)
+testingData$Status <- ifelse(testingData$Status == 1, 1, 0)
 
 # Build Confusion Matrix for Testing Data
 testingData %>%
-  tabyl(var1 = model2Class, var2 = graduated) %>%
+  tabyl(var1 = model2Class, var2 = Status) %>%
   adorn_title(
     placement = "combined",
     row_name = "Predicted",

@@ -5,29 +5,34 @@ date: "2023-12-12"
 output: html_notebook
 ---
 
+# Part III: Exploring the sub-clusters of the cirrhosis data using unsupervised learning
 
-# Unsupevised Learning
+In this section, we sought to if there are sub-collections of patients. We expect sub-collections to mimic medical definitions of the stages of Biliary Cirrhosis but are curious to see if clustering can reveal some newer observations.
 
- In this section, we sought to if there are sub-collections of patients. We expect sub-collections to mimic medical definitions of the stages of Biliary Cirrhosis but are curious to see if clustering can reveal some newer observations. 
+## Introduction
 
-### Stages of Biliary Cirrhosis
+Biliary Cirrhosis patients are typically clustered in four main clusters ([Source](https://www.healthline.com/health/primary-biliary-cirrhosis#stages){.uri}):
 
-Stage 1: There's inflammation and damange to the walls of medium-sized bile ducts.
+-   Stage 1: There's inflammation and damage to the walls of medium-sized bile ducts.
 
-Stage 2: There's blockage of the small bile ducts.
+-   Stage 2: There's blockage of the small bile ducts.
 
-Stage 3: This stage marks the beginning of scarring. 
+-   Stage 3: This stage marks the beginning of scarring.
 
-Stage 4: Cirrhosis has developed. This permanent, severe, scarring and damange to the liver.
+-   Stage 4: Cirrhosis has developed. This permanent, severe, scarring and damage to the liver.
 
-Source of information: https://www.healthline.com/health/primary-biliary-cirrhosis#stages
+In this section we will be using clustering on our data. K-means Clustering is an unsupervised learning technique where data points are grouped based on their similarities. It's commonly used to identify patterns and structures within datasets without prior knowledge of the groups. The main advantage of clustering is its ability to discover hidden patterns in data. However, a significant drawback is the subjectivity in defining the 'similarity' criteria, which can lead to varying results and interpretations.
 
+[![K-means clustering ([Source](https://medium.datadriveninvestor.com/k-means-clustering-4a700d4a4720))](1*fz-rjYPPRlGEMdTI-RLbDg.png)](https://medium.datadriveninvestor.com/k-means-clustering-4a700d4a4720)
 
-#do the ml, take about observational stages vs now quantify, look into the different variables and what they mean. 
+An important motivation for this part of the study is explore how does "Stage" which is typically defined based on medical professionals' observations compares to the data that we have in this data set.
 
-### Data Wrangling
+## Pre-processing the data
+
+We had to pre-process the data for the best performance. First, we removed the 'Stage' column to avoid using outcome-related features in the unsupervised learning. The rows with N/A values were also removed. Lastly, we transformed various categorical variables into numeric formats, which is necessary for clustering algorithms.
+
 ```{r}
-
+#do the ml, take about observational stages vs now quantify, look into the different variables and what they mean.
 cirrhosisCluster <- cirrhosis
 
 cirrhosisCluster <- cirrhosisCluster %>%                 
@@ -66,15 +71,15 @@ cirrhosisCluster$Age_Years <- round(cirrhosisCluster$Age_Years) #round age to wh
   
    #mutate(Status = ifelse(Status %in% c('C', 'CL'), 0 , 1)) %>%
           #    mutate(Drug = ifelse(Drug == "D-penicillamine", 0, 1))
+
+  
+#???:
+  
+#make column yes no edema #then yes no under treatment
+
+#same for transplant stuff
 ```
 
-#make column yes no edema
-#then yes no under treatment
-
-
-#same for tranplant stuff
-
-## DO I NEED THIS DIST??
 ```{r}
 distCirrhosis <- dist(
   x = cirrhosisCluster,
@@ -83,9 +88,9 @@ distCirrhosis <- dist(
 
 ```
 
+## Methodology
 
-
-### A mixed hierarchial and non-hierarchial 
+To apply the k-means algorithm. A mixed hierarchical and non-hierarchical was applied. This was done using the hkmeansm module, with k = 4 as our initial value. Based on the data properties, the euclidean (L2) distance works best.
 
 ```{r}
 
@@ -99,24 +104,18 @@ hybridCirrhosis <- hkmeans(
 
 ```
 
+## Results
 
-### Visualize Results
+We were able to visualize the results of the k-means algorithm. The first step was making a color palette and plotting the dendrogram tree.
 
-
-### Making a color palette
 ```{r}
 
 StagesPalette <- c("#AA336A", "#770737", "#40B5AD", "#009E60", "#9FE2BF")
 
 ```
 
-
 ```{r}
-
 ## MAKE A NEW PALLETE TO VISUALIZE
-
-
-
 # Plot the initial dendrogram for hybrid approach ----
 set.seed(380)
 hkmeans_tree(
@@ -127,7 +126,8 @@ hkmeans_tree(
 )
 
 ```
-### Testing for optimal k value
+
+As, you can see, the model was able to create clear clusters for the data. However, it is important to find the best value of k to get the optimal clusters. To do this we can use a scree plot. Here, we\'re looking for the number of clusters that corresponds to the \"elbow\".
 
 ```{r}
 # Create scree plot for choosing k ----
@@ -144,7 +144,7 @@ fviz_nbclust(
 
 ```
 
-### Trying k = 5
+From this, we identified that 5 was the ideal value of k, where the Total Within [Cluster] Sums of Squares begins leveling off. Let us create a new k-means model with k = 5. We can plot this refined model, with a format more easy to visualize.
 
 ```{r}
 
@@ -157,7 +157,6 @@ hybridCirrhosis2 <- hkmeans(
 )
 
 ```
-
 
 ```{r}
 # Plot the final dendrogram for hybrid approach ----
@@ -176,21 +175,26 @@ fviz_dend(
 
 ```
 
-```{r}
+As you can see, the 5 clusters were identified, which are color coded in our updated diagram.
 
+Lastly, let us plot these clusters. Here is a plot of the initial model where k = 4
+
+```{r}
 # Plot the final clustering for hybrid approach ----
 # library(factoextra)
 fviz_cluster(
   object = hybridCirrhosis,
   stand = FALSE,
   geom = "point",
-  main = "Hybrid Cluster Plot"
+  main = "Hybrid Cluster Plot - Initial model"
 ) +
   scale_color_manual(values = StagesPalette) +
   scale_fill_manual(values = StagesPalette) +
   theme_bw() 
 
 ```
+
+We can also plot our refined model, as you can see the plot below identifies 5 clear clusters.
 
 ```{r}
 
@@ -200,7 +204,7 @@ fviz_cluster(
   object = hybridCirrhosis2,
   stand = FALSE,
   geom = "point",
-  main = "Hybrid Cluster Plot"
+  main = "Hybrid Cluster Plot - Refined model"
 ) +
   scale_color_manual(values = StagesPalette) +
   scale_fill_manual(values = StagesPalette) +
