@@ -14,9 +14,9 @@ library(survminer)
 
 ```
 
-# EDA
+# Exploratory Data Analysis
 
-## Exploring the demographics of the patients
+## Part 1: Exploring the demographics of the patients
 
 ### Sex Ratio of Patients
 
@@ -66,7 +66,7 @@ ggplot(cirrhosis, aes(x=Age_Years)) +
 
 The distribution of ages is quite normal.
 
-## Looking at the data itself
+## Part 2: Looking at the data itself
 
 ### NA counts amongst our variables
 
@@ -75,7 +75,7 @@ count <-  data.frame(NA_CountsPerVar = colSums(is.na(cirrhosis)))
 kable(count)
 ```
 
-An observation is that many of the variables have 106 NAs. This indicates that a good fraction [106 patients] were equally tracked and measured in a less extensive way.
+An observation is that many of the variables have 106 NAs. This indicates that a good fraction [106 patients] could have been equally tracked and measured in a less extensive way.
 
 ## Distribution of Stages of Biliary Cholangitis
 
@@ -88,7 +88,7 @@ cirrhosis %>%
 
 This distribution is left skewed and not symmetric. Most patients have stage 3 and then 4 of Biliary Cholangitis.
 
-## Exploring some interactions of variables
+## Part 3: Exploring some interactions of variables
 
 ### How does prescense of a D-penicillamine with stage of Biliary Cholangitis impact number of days till death?
 
@@ -115,7 +115,7 @@ Edema is swelling due to too much liquid trapped in the body's tissues. It's com
 
 ### Survival Analysis Based on Treatment and Stage: How does the survival rate differ among patients at different stages of PBC who received D-penicillamine versus placebo?
 
-This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact. (LOLL this is what the study acc sought to discover)
+This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact.
 
 ```{r}
 surv_object <- Surv(cirrhosis$N_Days, cirrhosis$Status == 'D')

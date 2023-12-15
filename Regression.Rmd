@@ -188,7 +188,7 @@ as.data.frame(summary(model2)$coefficients) %>%
 
 ```
 
-This analysis suggests significant associations between several predictors (Bilirubin, Age, Alk_Phos, Prothrombin, Spiders) and the status of the patient. Each predictor, including the Intercept, shows a statistically significant effect, as indicated by their small p-values (Pr(\>\|z\|)). The negative coefficients for Bilirubin, Age, Alk_Phos, Prothrombin, and Spiders imply that increases in these variables are associated with a decrease in the log-odds of the outcome. Bilirubin and Spiders are showing notably strong effects in the model.
+This is the role of inference in evaluating our model. The most notable predictors are Bilirubin, Age, Alk_Phos, and Prothrombin, each showing a statistically significant relationship (p \< 0.05) with the dependent variable. The Intercept and EdemaY have extremely significant p-values, but the practical significance of EdemaY is questionable due to its large standard error. Other variables like Spiders, SGOT, DrugPlacebo, and Copper, while contributing to the model, do not reach conventional levels of statistical significance (p \< 0.05).
 
 ```{r}
 #do the Tukey-Anscombe plot
@@ -214,7 +214,7 @@ ggplot(
   )
 ```
 
-This figure shows us the Tukey-Anscombe plot using Pearson residuals for Model 2. In an ideal fit, the residuals should be evenly distributed about zero with constant mean and variance. The shape of the line suggests that the model is not capturing someunder lying structure in the data, especially in extreme cases.
+This figure shows us the Tukey-Anscombe plot using Pearson residuals for Model 2. In an ideal fit, the residuals should be evenly distributed about zero with constant mean and variance. The shape of the line suggests that the model is not capturing someunder lying structure in the datain extreme cases.
 
 ```{r}
 #plot the gvif
@@ -326,7 +326,7 @@ separationplot(
 
 The separation plot assesses the the fit of the model by providing the model's ability to predict occurrences with a high probability and non-occurrences with low probability. The separation plot above separation plot suggests that Model 2 has a reasonably good performance in predicting the patient's status, especially for the observations on the left-most side of the plot compared to Model 1 with the training data. We will later compare this graph with the testing data.
 
-Lastly, let us look at the ROC curves for bothe the models.
+Lastly, let us look at the ROC curves for both the models.
 
 ```{r}
 ## Merge into existing data frame
@@ -362,9 +362,19 @@ ggplot(
 
 From the graphs we can interpret that:
 
-Model 1: - Its ROC curve is above the line of no discrimination, indicating that the model has some predictive capabilities. - The AUC is 0.64, which is better than random guessing but suggests there's room for improvement.
+Model 1:
 
-Model 2: - The ROC curve for Model 2 is significantly above that of Model 1, and much closer to the top-left corner, indicating better predictive performance. - The AUC is 0.899, which suggests a good classification performance, and it's notably better than Model 1. - Its ability to discriminate between positive and negative classes is superior to that of Model 1.
+-   Its ROC curve is above the line of no discrimination, indicating that the model has some predictive capabilities
+
+-   The AUC is 0.638, which is better than random guessing but suggests there's room for improvement.
+
+Model 2:
+
+-   The ROC curve for Model 2 is significantly above that of Model 1, and much closer to the top-left corner, indicating better predictive performance.
+
+-   The AUC is 0.899, which suggests a good classification performance, and it's notably better than Model 1.
+
+-   Its ability to discriminate between positive and negative classes is superior to that of Model 1.
 
 Lastly, let us plot our influence plot.
 
@@ -377,7 +387,7 @@ The influence plot shows several data points with high leverage and large residu
 
 # Testing our model
 
-Using our final model, we now turn to see how well this classifier does on our testing data. Recall that we initally set the test data during the train test split.
+Using our final model, we now turn to see how well this classifier does on our testing data. Recall that we initially set the test data during the train test split.
 
 The confusion matrix below shows the performance of our model using the naïve decision rule.
 
@@ -429,7 +439,7 @@ testingData %>%
 
 -   **F1 Score**: Approximately 55.56%
 
-This shows that our model is has struggled with overfitting, with an especially low precision score. We will discuss this in the comparison with the tree model, but this is a limitation of our data size. Lastly, we can plot the separation plot. We can see the separation has increased due to the over fitting we discussed.
+This shows that our model is has struggled with overfitting, with an especially low precision score. We will discuss this in the comparison with the tree model, but this is an importnat limitation of our data size as we discussed in the introduction. Lastly, we can plot the separation plot. We can see the separation has increased due to the over fitting we discussed.
 
 ```{r}
 #Sepeation Plot

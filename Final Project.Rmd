@@ -95,23 +95,6 @@ cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
 cirrhosis <- cirrhosis[,-1]
 ```
 
--   Engage in Exploratory Data Analysis
-
--   Use Machine Learning Algorithms:
-
-    -   You must use at least one of each: a Regression-based algorithm, a Tree-based algorithm, and an Unsupervised Learning algorithm.
-    -   Each algorithm must be explained for a general audience.
-    -   All results should be explained.
-    -   Where appropriate, comparisons between methods should be discussed. This includes highlighting the strengths and weaknesses of the various approaches as well as when each is appropriate.
-
--   A discussion of what you've learned from your work about the context and recommendations for future work.
-
--   Author Contributions--list out who did what in the project.
-
--   References--Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
-
--   A commented Code Appendix
-
 ```{r}
 
 cirrhosis %>% 

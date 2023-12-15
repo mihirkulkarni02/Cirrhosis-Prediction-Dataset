@@ -232,3 +232,5 @@ ggplot(cirrhosisCluster2, aes(x = factor(cluster), fill = factor(Stage))) +
   theme_minimal()
 
 ```
+
+We can see that the 

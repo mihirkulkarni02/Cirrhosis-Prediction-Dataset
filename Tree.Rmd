@@ -64,7 +64,7 @@ testingData <- modelCirrhosis %>%
 
 There are useful packages to build decision trees in R: the {tree} and the {rpart} (recursive partitioning) packages.
 
-In this report, I have decided to use {rpart} because it provides more flexibility for surrogate splits and the trees are a bit easier to make attractive looking.
+In this report, we have decided to use {rpart} because it provides more flexibility for surrogate splits and the trees are a bit easier to make attractive looking.
 
 ```{r}
 # Grow Graduate tree via rpart package
@@ -95,7 +95,7 @@ rpart.plot(
 )
 ```
 
-(Explanation of above) To gain a further understanding of the data, we can plot a tree yielding Collection Node style trees. This can help us understand how the data is split.
+To gain a further understanding of the data, we can plot a tree yielding Collection Node style trees. This can help us understand how the data is split.
 
 ```{r}
 # Using the rattle package to visualize the tree ----
@@ -107,6 +107,8 @@ fancyRpartPlot(
   sub = NULL
 )
 ```
+
+The tree shows us the splits that were done on Age, Bilirubin and Prothrombin. Interestingly, Stage did not contribute in the tree.
 
 ### Part 3: Pruning the tree
 
@@ -138,7 +140,7 @@ plotcp(
 )
 ```
 
-From the graph we can see that a cp of 0.011 is ideal as it is under the horizontal (dotted) reference line. We can prune the tree with this CP value.
+From the graph we can see that a cp of 0.039 is ideal as it is under the horizontal (dotted) reference line. We can prune the tree with this CP value.
 
 ```{r}
 # Prune the rpart Graduate Tree ----
@@ -157,6 +159,8 @@ fancyRpartPlot(
   sub = NULL
 )
 ```
+
+We ca see the pruned tree has cut out some leaf nodes. This would help in avoiding overfitting the model.
 
 ### Part 4: Results
 
@@ -214,7 +218,7 @@ kable(
   col.names = c("Prediction/Supervision", "0", "1"),
   digits = 3,
   booktabs = TRUE,
-  caption = "Model 1: Confusion Matrix",
+  caption = "Model 1: Confusion Matrix (0=Deceased, 1=Censored)",
   align = "c"
 ) %>%
 kable_styling(latex_options = "HOLD_position")
@@ -265,17 +269,7 @@ modelMetrics <- bind_rows(
 )
 ```
 
-From this, we can get the model's
-
--   True Positive (TP): Predicted Graduated and actually Graduated. In this case, 2217
-
--   False Positive (FP): Predicted Graduated but actually Not Graduated. In this case, 1000
-
--   False Negative (FN): Predicted Not Graduated but actually Graduated. In this case, 244
-
--   True Negative (TN): Predicted Not Graduated and actually Not Graduated. In this case, 659
-
-With this, we can also calculate the model's metrics.
+With this, we can also calculate the model's metrics on the test data.
 
 ```{r}
 # Make a nice looking table of model metrics ----
@@ -293,3 +287,5 @@ modelMetrics %>%
     table.attr = 'data-quarto-disable-processing="true"'
   )
 ```
+
+As you can see the model shows good accuracy with 72.9%. However, the specificity is an issue with 57.6%. Now let us compare this with a different type of model: logistic regression.
