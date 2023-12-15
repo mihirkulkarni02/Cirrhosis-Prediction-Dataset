@@ -1770,14 +1770,33 @@ cure at this time.</p>
 <div class="figcaption"><u>Primary Biliary Cholangitis (<a href="https://www.google.com/search?client=safari&amp;sca_esv=591276386&amp;rls=en&amp;sxsrf=AM9HkKmtJVOC2Jrf2BSYVB2O-QcnTSgx6g:1702664705100&amp;q=Primary+Biliary+Cholangitis&amp;tbm=isch&amp;source=lnms&amp;sa=X&amp;ved=2ahUKEwid0qyniJKDAxX9FFkFHVH3CcoQ0pQJegQIDxAB&amp;biw=1440&amp;bih=848&amp;dpr=2#imgrc=UeV_fhP-8vPOlM">Source</a>)</u></div>
 </div>
 </div>
+<div id="why-is-the-data-important-to-us" class="section level2">
+<h2>Why is the data important to us?</h2>
+<p>Both of us have been very interetsted in the intersection of medicine
+and machine learning. The idea that the concepts we are learning in our
+DS majors could have such an impact on the health industry was really
+special. Another important aspect was that there is so much potential
+for advancement of medicine, we both agreed that this area is MLs most
+promising aspect. The cirrhosis data set perticularly stood out to us
+because the data set included so many interesting attributes and we
+anted to see how they are connected with the outcomes of the
+patient.</p>
+<p>The data set also includes some important limitations. Most
+importantly, there are only 418 cases, greatly affecting the types of
+analysis we could do. This shows realm world problems data scientists
+face. Thus, our goal is to use our Statistical DS skillset to approach
+this problem, despite the limitations.</p>
+</div>
 <div id="objectives" class="section level2">
 <h2>Objectives</h2>
-<div id="q1-what-predictors-if-any-increases-an-individuals-chance-of-receiving-a-liver-transplant" class="section level3">
-<h3>Q1: What predictors, if any, increases an individual’s chance of
-receiving a liver transplant?</h3>
+<p>Exploring the study, we concluded on two core questions we hope to
+address in this report:</p>
+<div id="crq1-what-predictors-if-any-affected-the-status-of-the-patient-at-the-end-of-the-study" class="section level3">
+<h3>CRQ1: What predictors, if any affected the status of the patient at
+the end of the study?</h3>
 </div>
-<div id="q2-are-there-factors-not-currently-included-in-medical-definition-that-can-help-distinguish-different-stages-of-biliary-cholangitis" class="section level3">
-<h3>Q2: Are there factors not currently included in medical definition
+<div id="crq2-are-there-factors-not-currently-included-in-medical-definition-that-can-help-distinguish-different-stages-of-biliary-cholangitis" class="section level3">
+<h3>CRQ2: Are there factors not currently included in medical definition
 that can help distinguish different stages of Biliary Cholangitis?</h3>
 </div>
 </div>
@@ -1785,11 +1804,63 @@ that can help distinguish different stages of Biliary Cholangitis?</h3>
 <h2>Clinical Study + Dataset Background :</h2>
 <p>The dataset is produced from a clinical study by Mayo Clinic run from
 1974-1984. The final ‘Status’ of each patient was observed in 1986.
-‘Status’ was either Dead, Censored, or Censored due to liver
-transplant.</p>
-<p>A link to the original study is here: <a href="https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf" class="uri">https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf</a></p>
-<div id="load-in-packages" class="section level3">
-<h3>Load in Packages</h3>
+‘Status’ was either Dead, Censored, or Censored due to liver transplant.
+A link to the original study is here: <a href="https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf" class="uri">https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf</a></p>
+<p>The data contains the following attributes (<a href="https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data">Data
+Source</a>):</p>
+<ol style="list-style-type: decimal">
+<li><strong>ID</strong>: unique identifier<br />
+</li>
+<li><strong>N_Days</strong>: number of days between registration and the
+earlier of death, transplantation, or study analysis time in July
+1986<br />
+</li>
+<li><strong>Status</strong>: status of the patient C (censored), CL
+(censored due to liver tx), or D (death)<br />
+</li>
+<li><strong>Drug</strong>: type of drug D-penicillamine or placebo<br />
+</li>
+<li><strong>Age</strong>: age in [days]<br />
+</li>
+<li><strong>Sex</strong>: M (male) or F (female)<br />
+</li>
+<li><strong>Ascites</strong>: presence of ascites N (No) or Y
+(Yes)<br />
+</li>
+<li><strong>Hepatomegaly</strong>: presence of hepatomegaly N (No) or Y
+(Yes)<br />
+</li>
+<li><strong>Spiders</strong>: presence of spiders N (No) or Y
+(Yes)<br />
+</li>
+<li><strong>Edema</strong>: presence of edema N (no edema and no
+diuretic therapy for edema), S (edema present without diuretics, or
+edema resolved by diuretics), or Y (edema despite diuretic
+therapy)<br />
+</li>
+<li><strong>Bilirubin</strong>: serum bilirubin in [mg/dl]<br />
+</li>
+<li><strong>Cholesterol</strong>: serum cholesterol in [mg/dl]<br />
+</li>
+<li><strong>Albumin</strong>: albumin in [gm/dl]<br />
+</li>
+<li><strong>Copper</strong>: urine copper in [ug/day]<br />
+</li>
+<li><strong>Alk_Phos</strong>: alkaline phosphatase in [U/liter]<br />
+</li>
+<li><strong>SGOT</strong>: SGOT in [U/ml]<br />
+</li>
+<li><strong>Triglycerides</strong>: triglicerides in [mg/dl]<br />
+</li>
+<li><strong>Platelets</strong>: platelets per cubic [ml/1000]<br />
+</li>
+<li><strong>Prothrombin</strong>: prothrombin time in seconds [s]<br />
+</li>
+<li><strong>Stage</strong>: histologic stage of disease (1, 2, 3, or
+4)</li>
+</ol>
+<p>For the basic pre-processing, we binary-encoded the categorical
+variables in the data set and set them as factors.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5saWJyYXJ5KHN1cnZpdmFsKVxubGlicmFyeShnZ3Bsb3QyKVxubGlicmFyeShzdXJ2aXZhbClcbmxpYnJhcnkoc3Vydm1pbmVyKVxubGlicmFyeShrYWJsZUV4dHJhKVxubGlicmFyeShmYWN0b2V4dHJhKVxuXG5gYGAifQ== -->
@@ -1804,9 +1875,6 @@ library(factoextra)
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
-<div id="data-processing" class="section level3">
-<h3>Data Processing</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2xvYWQgaW4gdGhlIGRhdGFcbmxpYnJhcnkodGlkeXZlcnNlKVxuI2xvYWQgZGF0YVxuY2lycmhvc2lzIDwtIHJlYWRfY3N2KFwiY2lycmhvc2lzLmNzdlwiKVxuYGBgIn0= -->
@@ -1826,7 +1894,7 @@ dbl (13): ID, N_Days, Age, Bilirubin, Cholesterol, Albumin, Copper, Alk_Phos, SG
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChjaXJyaG9zaXMpXG5gYGAifQ== -->
 <pre class="r"><code>head(cirrhosis)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MjAsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyAyMCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUE2MVZUVXdUUVJRZTJtNmhMWCtKUFhneXhvamgwcHJJeFF0MnNCVWtLRlNLQWdrSm1XNkhkbVc3dTJ5M2tYcVJnM3BUTGlaR0RvYkEzY1NUSGp3WXIrcEpFamlxTitJRkR4SkRESFYyMzd4aXR5RXgwVW0yNzJmZU4rKzlieWF2azVtWmdlaE1sQkFTSktGZ0d3a3FRaVhLemFuaHhFVkNRZ0ZodEpFUWliaHlXUVNkRUVwY2ZOM2lDNmYyaUxjb2tiSkR5bDRwNDFLZUpMZzhISzFKLzhzbklGZlhRVDRIQUgyNkFuTHpNZUxjRThOWVNBYVZkSXNIbFVENjJwR3JHZDZUU1ZqYzBGUk4xMWxaTS9qL2RMZG5kYWJ5dk9rM3NmR3RmV2hzNjR6SEdkMDU5RHFsbng2Q2ZIOGU5cmMza05PbXhvZGJsT3ZIYnczNzBiT29qUCtWY2h5NjlaaldyZGwvUWgrZnV3SEt0U2hObFFQYkNhQXc5ZjJadTlaUyt3dmVTdjM2NEs2UE5EYmdyZFF1N0Rkd1ZoWnV3ZjRNY2tFK1YwTSt5eVVMcEltdlUrSkM4dHplMWJuK0grOVdhV3c3T21odGJ0UFFqVzhQVHIyZXBKMnVGUjJrUGVCdjRGUjU3cGpNY3hzdW4yYWx6V1Fkbzc1OGF6dmdmL01WOHE2Y0J2dlZMdGozZjRMOWFLVVp4eTU1UE5BNU52SWlmdmNMblFtRFBaNTF5MXVpYzZNZUgzU2FOdU80clBPV3JHdE0ydFBTbnBSeXdwZXYrQmI4aStzZzg4aXJsQXlDNysyNXYrMGJEVncvM0JmdGczdWkvZkw4czNCZnRFL3lmYzdIUzYrTTg0OGp2NzhEWVUxelRqRlltVmNJUE1FNHpwTlJuQ3poOGZrTXExWFF5am5NcWFJVnl0alZvdFNEUTBXY0NzRWNYOGFKTUZSUk5ZY2pvUE1xdDVoamxubVI2VFVNeVZsYWdkc1lvbHdwOERLVFJ1U3lwbXQyTmE4WjBoRkxsMHlkVnh4dW0zb2poWjZ2bGhzUjRiUnBXZHlXVnNlUXZqaWZMWm1OaW5NakUxTlM3NXF5YTBWZFU3a3Q4bU5BUkl3d2grdmNRVWNzYTV0T3lUYkxSMFVvZ2dUUmJET05FZHU4azBRcXUxd0szVmRScjljUC9IeXJPcXNnMytpTUZwakRrZ3Uyd0F2cjBBZHBOeTFITXcwQkNyaC9TSW9QM0diN0hEMVZ3NjJra0ZCTFZXTXhjY0ZONEczRDZwSjYrQTg5RGlrRGRYbVVnblJ5bzNnMDd4V2Q1VGtTM3kwNjlocE9XclptT05pSjhGYVNqdWt3akl1cXBvNGVyemR5K0JzeEdPeEFod2NBQUE9PSJ9 -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MjAsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyAyMCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUE2MVZUVXdUUVJRZWFMZlFscDhtOXVESkdDT0dTMnNNTWZHQ0hXd0ZDUXFWb2tCQ1FxYmJvVjNaN2k3YmJhUmU1S0RlbEl1SmtZTWhjRGZ4cEFjUHhxdDZrZ1NPNm8xNHdZUEVHRU9kM1RldjJHMUlUSFNTN2Z1Wjk4MTc3NXZKNjJSbVppQXlFeUdFQkVndzBFWUNpbENKY21OcU9IR0JrR0M3TU5wSWtJUmR1U3lDamdrbExyNGU4WVZTZThSYmxFalpLV1ZNeXJpVXh3a3VEMGRyMHYvaU1jalZkWkRQQUVDZnJJRGNmSVE0OThRUUZwSkJKZDNpUWFVOWZmWFExUXp2elNRc2JtaXFwdXVzckJuOGY3bzdzanBUZWQ3MG05ajQxajQwdG5YSzQ0enVISGlkMG84UFFMNDdDL3ZiRzhocFUrUERMY3ExbzdlRy9laFpWTWIvU2prSzNYcE02OWJzUDZHUHp0MEE1VnFVcHNxQjdRUlFtUHIyMUYxcnFmMEZiNlYrdlhmWEJ4b2Q4RlpxRi9ZYk9Dc0x0MkIvQXJrZ242c2huK1dTQmRMRTF5bHhRWGx1YkhXdS8vdmJWUnJkamd4YW05czBlUDNyL1JPdkptbVhhMFVHYVMvNEd6aFZuanNtODl5Q3k2ZFphVE5aeDZndjM5b08rRjkvZ2J3cko4Rit1UXYydlI5Z1AxeHB4ckdMSGc5MGpvMDhqOS81VEdkQ1lJOW4zZktXNk55b3h3ZWRwczA0THV1OEtlc2FrL2EwdENlbG5QRGxLNzRCLytJNnlEenlLaVdENEx0NzdtL0hSZ1BYRC9kRisrQ2VhTDg4L3pUY0YrMlRmSi94OFJLVGNmNXg1UGQzSXF4cHppa0dLL01LZ1NjWXgza3lpcE1sTkQ2ZlliVUtXam1IT1ZXMGdobTdXcFI2WUtpSVV5R1E0OHM0RVlZcXF1WndCSFJkNFJaenpESXZNcjJHSVRsTEszQWJRNVRMQlY1bTBnaGYwblROcnVZMVF6cWk2WktwODRyRGJWTnZwTkR6MVhJaklwUTJMWXZiMHVvYzBoZm5zeVd6VVhGdVpHSks2dDFUZHEyb2F5cTNSWDRNQ0lzUjVuQ2RPK2lJWm0zVEtkbG0rYkFJUlpBZ21tMm1NV3lidDVOSVpiZExvZnNxNnZYNlR6L2ZxczRxeURjNkl3WG1zT1NDTGZEQ092QkJPa3pMMFV4RGdOcmRQeVRGQjI2emZZNVkxWEFyS1NUVVV0VllUSnc3NzJidzltRjFTejMwaHg2SG5PMTFlWmFDZkhLamVEandGWjNsT1RMZkkxcjJPazVhdG1ZNDJJcndWcEtPNlRDTWk2aW1qaDZ2T1hMd0c0a210NHlJQndBQSJ9 -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
 {"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["N_Days"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Status"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Drug"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Sex"],"name":[6],"type":["chr"],"align":["left"]},{"label":["Ascites"],"name":[7],"type":["chr"],"align":["left"]},{"label":["Hepatomegaly"],"name":[8],"type":["chr"],"align":["left"]},{"label":["Spiders"],"name":[9],"type":["chr"],"align":["left"]},{"label":["Edema"],"name":[10],"type":["chr"],"align":["left"]},{"label":["Bilirubin"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["Cholesterol"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["Albumin"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["Copper"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["Alk_Phos"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["SGOT"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["Tryglicerides"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["Platelets"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["Prothrombin"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["Stage"],"name":[20],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"400","3":"D","4":"D-penicillamine","5":"21464","6":"F","7":"Y","8":"Y","9":"Y","10":"Y","11":"14.5","12":"261","13":"2.60","14":"156","15":"1718.0","16":"137.95","17":"172","18":"190","19":"12.2","20":"4"},{"1":"2","2":"4500","3":"C","4":"D-penicillamine","5":"20617","6":"F","7":"N","8":"Y","9":"Y","10":"N","11":"1.1","12":"302","13":"4.14","14":"54","15":"7394.8","16":"113.52","17":"88","18":"221","19":"10.6","20":"3"},{"1":"3","2":"1012","3":"D","4":"D-penicillamine","5":"25594","6":"M","7":"N","8":"N","9":"N","10":"S","11":"1.4","12":"176","13":"3.48","14":"210","15":"516.0","16":"96.10","17":"55","18":"151","19":"12.0","20":"4"},{"1":"4","2":"1925","3":"D","4":"D-penicillamine","5":"19994","6":"F","7":"N","8":"Y","9":"Y","10":"S","11":"1.8","12":"244","13":"2.54","14":"64","15":"6121.8","16":"60.63","17":"92","18":"183","19":"10.3","20":"4"},{"1":"5","2":"1504","3":"CL","4":"Placebo","5":"13918","6":"F","7":"N","8":"Y","9":"Y","10":"N","11":"3.4","12":"279","13":"3.53","14":"143","15":"671.0","16":"113.15","17":"72","18":"136","19":"10.9","20":"3"},{"1":"6","2":"2503","3":"D","4":"Placebo","5":"24201","6":"F","7":"N","8":"Y","9":"N","10":"N","11":"0.8","12":"248","13":"3.98","14":"50","15":"944.0","16":"93.00","17":"63","18":"NA","19":"11.0","20":"3"}],"options":{"columns":{"min":{},"max":[10],"total":[20]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
@@ -1835,9 +1903,6 @@ dbl (13): ID, N_Days, Age, Bilirubin, Cholesterol, Albumin, Copper, Alk_Phos, SG
 <!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
-<div id="pre-process-the-data" class="section level3">
-<h3>Pre-process the data</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VuY29kZSB0aGUgc2V4LCBhc2NpdGVzLCBoZXBhdG9tZWdhbHksIHNwaWRlcnMsIGVkZW1hIGludG8gYmluYXJ5IHZhcmlhYmxlc1xuY2lycmhvc2lzJFNleCA8LSBpZmVsc2UoY2lycmhvc2lzJFNleCA9PSBcIkZcIiwgMCwgMSlcbmNpcnJob3NpcyRBc2NpdGVzIDwtIGlmZWxzZShjaXJyaG9zaXMkQXNjaXRlcyA9PSBcIllcIiwgMSwgMClcbmNpcnJob3NpcyRIZXBhdG9tZWdhbHkgPC0gaWZlbHNlKGNpcnJob3NpcyRIZXBhdG9tZWdhbHkgPT0gXCJZXCIsIDEsIDApXG5jaXJyaG9zaXMkU3BpZGVycyA8LSBpZmVsc2UoY2lycmhvc2lzJFNwaWRlcnMgPT0gXCJZXCIsIDEsIDApXG4jZmFjdG9yaXplIHRoZSBzdGFnZVxuY2lycmhvc2lzJFN0YWdlIDwtIGZhY3RvcihjaXJyaG9zaXMkU3RhZ2UpXG5jaXJyaG9zaXMkU3RhdHVzIDwtIGZhY3RvcihjaXJyaG9zaXMkU3RhdHVzKVxuY2lycmhvc2lzJERydWcgPC0gZmFjdG9yKGNpcnJob3NpcyREcnVnKVxuY2lycmhvc2lzJFNleCA8LSBmYWN0b3IoY2lycmhvc2lzJFNleClcbiNjaXJyaG9zaXMkQXNjaXRlcyA8LSBmYWN0b3IoY2lycmhvc2lzJEFzY2l0ZXMpXG4jY2lycmhvc2lzJEhlcGF0b21lZ2FseSA8LSBmYWN0b3IoY2lycmhvc2lzJEhlcGF0b21lZ2FseSlcbiNjaXJyaG9zaXMkU3BpZGVycyA8LSBmYWN0b3IoY2lycmhvc2lzJFNwaWRlcnMpXG5jaXJyaG9zaXMkRWRlbWEgPC0gZmFjdG9yKGNpcnJob3NpcyRFZGVtYSlcbmNpcnJob3NpcyRTZXggPC0gZmFjdG9yKGlmZWxzZShjaXJyaG9zaXMkU2V4ID09IDAsIFwiRmVtYWxlXCIsIFwiTWFsZVwiKSlcblxuI0Ryb3AgdGhlIGZpcnN0IGNvbHVtblxuY2lycmhvc2lzIDwtIGNpcnJob3Npc1ssLTFdXG5gYGAifQ== -->
@@ -1898,9 +1963,8 @@ cirrhosis %&gt;%
 <!-- rnb-chunk-end -->
 </div>
 </div>
-</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRmluYWwgUHJvamVjdCBSZXBvcnQ6IEFuIGV4cGxvcmF0aW9uIG9mIEJpbGlhcnkgQ2lycmhvc2lzIGFuZCBUcmVhdG1lbnRzIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKYXV0aG9yczogIk1paGlyIEt1bGthcm5pLCBOaXRoaWthIE1lbm9uIgotLS0KCiMgQmFja2dyb3VuZAoKIyMgV2hhdCBpcyBCaWxpYXJ5IENob2xhbmdpdGlzPwoKUHJpbWFyeSBCaWxpYXJ5IENob2xhbmdpdGlzIChwcmV2aW91c2x5IGNhbGxlZCBQcmltYXJ5IEJpbGlhcnkgQ2lycmhvc2lzKSBpcyBhbiBhdXRvaW1tdW5lIGRpc2Vhc2Ugd2hlcmUgYmlsZSBkdWN0cyBiZWNvbWUgc3dvbGxlbiBhbmQgaW5mbGFtZWQgYW5kIGJsb2NrIHRoZSBmbG93IG9mIGJpbGUuIEJpbGUgaXMgYSBzdWJzdGFuY2UgdGhhdCBhaWRzIHdpdGggZGlnZXN0aW9uLiBUaGUgYmlsZSBkdWN0cyBjYXJyeSBiaWxlIGZyb20gdGhlIGxpdmVyIHRvIHRoZSBzbWFsbCBpbnRlc3RpbmUuIFRoZSBzd2VsbGluZyBhbmQgaW5mbGFtbWF0aW9uIGNhbiBsZWFkIHRvIHNjYXJyaW5nIG9mIHRoZSBsaXZlciB3aGljaCBpcyBjaXJyaG9zaXMuIEFkdmFuY2VkIGNpcnJob3NpcyBjYW4gbGVhZCB0byBsaXZlciBmYWlsdXJlIG9yIGxpdmVyIGNhbmNlci4gTWVkaWNhdGlvbiBjYW4gc2xvdyBwcm9ncmVzc2lvbi4gVGhlcmUgaXMgbm8gZGVmaW5pdGUgY3VyZSBhdCB0aGlzIHRpbWUuCgohW1tQcmltYXJ5IEJpbGlhcnkgQ2hvbGFuZ2l0aXMgKFtTb3VyY2VdKGh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vc2VhcmNoP2NsaWVudD1zYWZhcmkmc2NhX2Vzdj01OTEyNzYzODYmcmxzPWVuJnN4c3JmPUFNOUhrS210SlZPQzJKcmYyQlNZVkIyTy1RY25UU2d4Nmc6MTcwMjY2NDcwNTEwMCZxPVByaW1hcnkrQmlsaWFyeStDaG9sYW5naXRpcyZ0Ym09aXNjaCZzb3VyY2U9bG5tcyZzYT1YJnZlZD0yYWhVS0V3aWQwcXluaUpLREF4WDlGRmtGSFZIM0Njb1EwcFFKZWdRSUR4QUImYml3PTE0NDAmYmloPTg0OCZkcHI9MiNpbWdyYz1VZVZfZmhQLTh2UE9sTSkpXXsudW5kZXJsaW5lfV0oMTc3MTUtcHJpbWFyeS1iaWxpYXJ5LWNob2xhbmdpdGlzLndlYnApCgojIyBPYmplY3RpdmVzCgojIyMgUTE6IFdoYXQgcHJlZGljdG9ycywgaWYgYW55LCBpbmNyZWFzZXMgYW4gaW5kaXZpZHVhbCdzIGNoYW5jZSBvZiByZWNlaXZpbmcgYSBsaXZlciB0cmFuc3BsYW50PwoKIyMjIFEyOiBBcmUgdGhlcmUgZmFjdG9ycyBub3QgY3VycmVudGx5IGluY2x1ZGVkIGluIG1lZGljYWwgZGVmaW5pdGlvbiB0aGF0IGNhbiBoZWxwIGRpc3Rpbmd1aXNoIGRpZmZlcmVudCBzdGFnZXMgb2YgQmlsaWFyeSBDaG9sYW5naXRpcz8KCiMjIENsaW5pY2FsIFN0dWR5ICsgRGF0YXNldCBCYWNrZ3JvdW5kIDoKClRoZSBkYXRhc2V0IGlzIHByb2R1Y2VkIGZyb20gYSBjbGluaWNhbCBzdHVkeSBieSBNYXlvIENsaW5pYyBydW4gZnJvbSAxOTc0LTE5ODQuIFRoZSBmaW5hbCAnU3RhdHVzJyBvZiBlYWNoIHBhdGllbnQgd2FzIG9ic2VydmVkIGluIDE5ODYuICdTdGF0dXMnIHdhcyBlaXRoZXIgRGVhZCwgQ2Vuc29yZWQsIG9yIENlbnNvcmVkIGR1ZSB0byBsaXZlciB0cmFuc3BsYW50LgoKQSBsaW5rIHRvIHRoZSBvcmlnaW5hbCBzdHVkeSBpcyBoZXJlOiA8aHR0cHM6Ly9mYWN1bHR5Lndhc2hpbmd0b24uZWR1L2FiYW5zYWwvU2hvcnRDb3Vyc2VfRHluYW1pY0RlY2lzaW9uTWFraW5nL0RpY2tzb24xOTg5X01heW9QQkNPcmlnaW5hbEFydGljbGUucGRmPgoKIyMjIExvYWQgaW4gUGFja2FnZXMKCmBgYHtyfQoKbGlicmFyeShzdXJ2aXZhbCkKbGlicmFyeShnZ3Bsb3QyKQpsaWJyYXJ5KHN1cnZpdmFsKQpsaWJyYXJ5KHN1cnZtaW5lcikKbGlicmFyeShrYWJsZUV4dHJhKQpsaWJyYXJ5KGZhY3RvZXh0cmEpCgpgYGAKCiMjIyBEYXRhIFByb2Nlc3NpbmcKCmBgYHtyfQojbG9hZCBpbiB0aGUgZGF0YQpsaWJyYXJ5KHRpZHl2ZXJzZSkKI2xvYWQgZGF0YQpjaXJyaG9zaXMgPC0gcmVhZF9jc3YoImNpcnJob3Npcy5jc3YiKQpoZWFkKGNpcnJob3NpcykKYGBgCgojIyMgUHJlLXByb2Nlc3MgdGhlIGRhdGEKCmBgYHtyfQojZW5jb2RlIHRoZSBzZXgsIGFzY2l0ZXMsIGhlcGF0b21lZ2FseSwgc3BpZGVycywgZWRlbWEgaW50byBiaW5hcnkgdmFyaWFibGVzCmNpcnJob3NpcyRTZXggPC0gaWZlbHNlKGNpcnJob3NpcyRTZXggPT0gIkYiLCAwLCAxKQpjaXJyaG9zaXMkQXNjaXRlcyA8LSBpZmVsc2UoY2lycmhvc2lzJEFzY2l0ZXMgPT0gIlkiLCAxLCAwKQpjaXJyaG9zaXMkSGVwYXRvbWVnYWx5IDwtIGlmZWxzZShjaXJyaG9zaXMkSGVwYXRvbWVnYWx5ID09ICJZIiwgMSwgMCkKY2lycmhvc2lzJFNwaWRlcnMgPC0gaWZlbHNlKGNpcnJob3NpcyRTcGlkZXJzID09ICJZIiwgMSwgMCkKI2ZhY3Rvcml6ZSB0aGUgc3RhZ2UKY2lycmhvc2lzJFN0YWdlIDwtIGZhY3RvcihjaXJyaG9zaXMkU3RhZ2UpCmNpcnJob3NpcyRTdGF0dXMgPC0gZmFjdG9yKGNpcnJob3NpcyRTdGF0dXMpCmNpcnJob3NpcyREcnVnIDwtIGZhY3RvcihjaXJyaG9zaXMkRHJ1ZykKY2lycmhvc2lzJFNleCA8LSBmYWN0b3IoY2lycmhvc2lzJFNleCkKI2NpcnJob3NpcyRBc2NpdGVzIDwtIGZhY3RvcihjaXJyaG9zaXMkQXNjaXRlcykKI2NpcnJob3NpcyRIZXBhdG9tZWdhbHkgPC0gZmFjdG9yKGNpcnJob3NpcyRIZXBhdG9tZWdhbHkpCiNjaXJyaG9zaXMkU3BpZGVycyA8LSBmYWN0b3IoY2lycmhvc2lzJFNwaWRlcnMpCmNpcnJob3NpcyRFZGVtYSA8LSBmYWN0b3IoY2lycmhvc2lzJEVkZW1hKQpjaXJyaG9zaXMkU2V4IDwtIGZhY3RvcihpZmVsc2UoY2lycmhvc2lzJFNleCA9PSAwLCAiRmVtYWxlIiwgIk1hbGUiKSkKCiNEcm9wIHRoZSBmaXJzdCBjb2x1bW4KY2lycmhvc2lzIDwtIGNpcnJob3Npc1ssLTFdCmBgYAoKLSAgIEVuZ2FnZSBpbiBFeHBsb3JhdG9yeSBEYXRhIEFuYWx5c2lzCgotICAgVXNlIE1hY2hpbmUgTGVhcm5pbmcgQWxnb3JpdGhtczoKCiAgICAtICAgWW91IG11c3QgdXNlIGF0IGxlYXN0IG9uZSBvZiBlYWNoOiBhIFJlZ3Jlc3Npb24tYmFzZWQgYWxnb3JpdGhtLCBhIFRyZWUtYmFzZWQgYWxnb3JpdGhtLCBhbmQgYW4gVW5zdXBlcnZpc2VkIExlYXJuaW5nIGFsZ29yaXRobS4KICAgIC0gICBFYWNoIGFsZ29yaXRobSBtdXN0IGJlIGV4cGxhaW5lZCBmb3IgYSBnZW5lcmFsIGF1ZGllbmNlLgogICAgLSAgIEFsbCByZXN1bHRzIHNob3VsZCBiZSBleHBsYWluZWQuCiAgICAtICAgV2hlcmUgYXBwcm9wcmlhdGUsIGNvbXBhcmlzb25zIGJldHdlZW4gbWV0aG9kcyBzaG91bGQgYmUgZGlzY3Vzc2VkLiBUaGlzIGluY2x1ZGVzIGhpZ2hsaWdodGluZyB0aGUgc3RyZW5ndGhzIGFuZCB3ZWFrbmVzc2VzIG9mIHRoZSB2YXJpb3VzIGFwcHJvYWNoZXMgYXMgd2VsbCBhcyB3aGVuIGVhY2ggaXMgYXBwcm9wcmlhdGUuCgotICAgQSBkaXNjdXNzaW9uIG9mIHdoYXQgeW91J3ZlIGxlYXJuZWQgZnJvbSB5b3VyIHdvcmsgYWJvdXQgdGhlIGNvbnRleHQgYW5kIHJlY29tbWVuZGF0aW9ucyBmb3IgZnV0dXJlIHdvcmsuCgotICAgQXV0aG9yIENvbnRyaWJ1dGlvbnMtLWxpc3Qgb3V0IHdobyBkaWQgd2hhdCBpbiB0aGUgcHJvamVjdC4KCi0gICBSZWZlcmVuY2VzLS1DaXRhdGlvbiBzdHlsZSBpcyB5b3VyIGNob2ljZSwgYnV0IGFsbCBzb3VyY2VzIHNob3VsZCBiZSBkb2N1bWVudGVkIChib3RoIGluIHRleHQgYW5kIGluIHRoZSBSZWZlcmVuY2VzIHNlY3Rpb24pLiBUaGlzIGluY2x1ZGVzIHdoZXJlIHlvdSBnb3QgeW91ciBkYXRhLgoKLSAgIEEgY29tbWVudGVkIENvZGUgQXBwZW5kaXgKCmBgYHtyfQoKY2lycmhvc2lzICU+JSAKICBnZ3Bsb3QoYWVzKHggPSBOX0RheXMpKSArIGdlb21faGlzdG9ncmFtKCkgKwogIGZhY2V0X3dyYXAoZmFjZXRzID0gdmFycyhTdGF0dXMpKQoKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRmluYWwgUHJvamVjdCBSZXBvcnQ6IEFuIGV4cGxvcmF0aW9uIG9mIEJpbGlhcnkgQ2lycmhvc2lzIGFuZCBUcmVhdG1lbnRzIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKYXV0aG9yczogIk1paGlyIEt1bGthcm5pLCBOaXRoaWthIE1lbm9uIgotLS0KCiMgQmFja2dyb3VuZAoKIyMgV2hhdCBpcyBCaWxpYXJ5IENob2xhbmdpdGlzPwoKUHJpbWFyeSBCaWxpYXJ5IENob2xhbmdpdGlzIChwcmV2aW91c2x5IGNhbGxlZCBQcmltYXJ5IEJpbGlhcnkgQ2lycmhvc2lzKSBpcyBhbiBhdXRvaW1tdW5lIGRpc2Vhc2Ugd2hlcmUgYmlsZSBkdWN0cyBiZWNvbWUgc3dvbGxlbiBhbmQgaW5mbGFtZWQgYW5kIGJsb2NrIHRoZSBmbG93IG9mIGJpbGUuIEJpbGUgaXMgYSBzdWJzdGFuY2UgdGhhdCBhaWRzIHdpdGggZGlnZXN0aW9uLiBUaGUgYmlsZSBkdWN0cyBjYXJyeSBiaWxlIGZyb20gdGhlIGxpdmVyIHRvIHRoZSBzbWFsbCBpbnRlc3RpbmUuIFRoZSBzd2VsbGluZyBhbmQgaW5mbGFtbWF0aW9uIGNhbiBsZWFkIHRvIHNjYXJyaW5nIG9mIHRoZSBsaXZlciB3aGljaCBpcyBjaXJyaG9zaXMuIEFkdmFuY2VkIGNpcnJob3NpcyBjYW4gbGVhZCB0byBsaXZlciBmYWlsdXJlIG9yIGxpdmVyIGNhbmNlci4gTWVkaWNhdGlvbiBjYW4gc2xvdyBwcm9ncmVzc2lvbi4gVGhlcmUgaXMgbm8gZGVmaW5pdGUgY3VyZSBhdCB0aGlzIHRpbWUuCgohW1tQcmltYXJ5IEJpbGlhcnkgQ2hvbGFuZ2l0aXMgKFtTb3VyY2VdKGh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vc2VhcmNoP2NsaWVudD1zYWZhcmkmc2NhX2Vzdj01OTEyNzYzODYmcmxzPWVuJnN4c3JmPUFNOUhrS210SlZPQzJKcmYyQlNZVkIyTy1RY25UU2d4Nmc6MTcwMjY2NDcwNTEwMCZxPVByaW1hcnkrQmlsaWFyeStDaG9sYW5naXRpcyZ0Ym09aXNjaCZzb3VyY2U9bG5tcyZzYT1YJnZlZD0yYWhVS0V3aWQwcXluaUpLREF4WDlGRmtGSFZIM0Njb1EwcFFKZWdRSUR4QUImYml3PTE0NDAmYmloPTg0OCZkcHI9MiNpbWdyYz1VZVZfZmhQLTh2UE9sTSkpXXsudW5kZXJsaW5lfV0oMTc3MTUtcHJpbWFyeS1iaWxpYXJ5LWNob2xhbmdpdGlzLndlYnApCgojIyBXaHkgaXMgdGhlIGRhdGEgaW1wb3J0YW50IHRvIHVzPwoKQm90aCBvZiB1cyBoYXZlIGJlZW4gdmVyeSBpbnRlcmV0c3RlZCBpbiB0aGUgaW50ZXJzZWN0aW9uIG9mIG1lZGljaW5lIGFuZCBtYWNoaW5lIGxlYXJuaW5nLiBUaGUgaWRlYSB0aGF0IHRoZSBjb25jZXB0cyB3ZSBhcmUgbGVhcm5pbmcgaW4gb3VyIERTIG1ham9ycyBjb3VsZCBoYXZlIHN1Y2ggYW4gaW1wYWN0IG9uIHRoZSBoZWFsdGggaW5kdXN0cnkgd2FzIHJlYWxseSBzcGVjaWFsLiBBbm90aGVyIGltcG9ydGFudCBhc3BlY3Qgd2FzIHRoYXQgdGhlcmUgaXMgc28gbXVjaCBwb3RlbnRpYWwgZm9yIGFkdmFuY2VtZW50IG9mIG1lZGljaW5lLCB3ZSBib3RoIGFncmVlZCB0aGF0IHRoaXMgYXJlYSBpcyBNTHMgbW9zdCBwcm9taXNpbmcgYXNwZWN0LiBUaGUgY2lycmhvc2lzIGRhdGEgc2V0IHBlcnRpY3VsYXJseSBzdG9vZCBvdXQgdG8gdXMgYmVjYXVzZSB0aGUgZGF0YSBzZXQgaW5jbHVkZWQgc28gbWFueSBpbnRlcmVzdGluZyBhdHRyaWJ1dGVzIGFuZCB3ZSBhbnRlZCB0byBzZWUgaG93IHRoZXkgYXJlIGNvbm5lY3RlZCB3aXRoIHRoZSBvdXRjb21lcyBvZiB0aGUgcGF0aWVudC4KClRoZSBkYXRhIHNldCBhbHNvIGluY2x1ZGVzIHNvbWUgaW1wb3J0YW50IGxpbWl0YXRpb25zLiBNb3N0IGltcG9ydGFudGx5LCB0aGVyZSBhcmUgb25seSA0MTggY2FzZXMsIGdyZWF0bHkgYWZmZWN0aW5nIHRoZSB0eXBlcyBvZiBhbmFseXNpcyB3ZSBjb3VsZCBkby4gVGhpcyBzaG93cyByZWFsbSB3b3JsZCBwcm9ibGVtcyBkYXRhIHNjaWVudGlzdHMgZmFjZS4gVGh1cywgb3VyIGdvYWwgaXMgdG8gdXNlIG91ciBTdGF0aXN0aWNhbCBEUyBza2lsbHNldCB0byBhcHByb2FjaCB0aGlzIHByb2JsZW0sIGRlc3BpdGUgdGhlIGxpbWl0YXRpb25zLgoKIyMgT2JqZWN0aXZlcwoKRXhwbG9yaW5nIHRoZSBzdHVkeSwgd2UgY29uY2x1ZGVkIG9uIHR3byBjb3JlIHF1ZXN0aW9ucyB3ZSBob3BlIHRvIGFkZHJlc3MgaW4gdGhpcyByZXBvcnQ6CgojIyMgQ1JRMTogV2hhdCBwcmVkaWN0b3JzLCBpZiBhbnkgYWZmZWN0ZWQgdGhlIHN0YXR1cyBvZiB0aGUgcGF0aWVudCBhdCB0aGUgZW5kIG9mIHRoZSBzdHVkeT8KCiMjIyBDUlEyOiBBcmUgdGhlcmUgZmFjdG9ycyBub3QgY3VycmVudGx5IGluY2x1ZGVkIGluIG1lZGljYWwgZGVmaW5pdGlvbiB0aGF0IGNhbiBoZWxwIGRpc3Rpbmd1aXNoIGRpZmZlcmVudCBzdGFnZXMgb2YgQmlsaWFyeSBDaG9sYW5naXRpcz8KCiMjIENsaW5pY2FsIFN0dWR5ICsgRGF0YXNldCBCYWNrZ3JvdW5kIDoKClRoZSBkYXRhc2V0IGlzIHByb2R1Y2VkIGZyb20gYSBjbGluaWNhbCBzdHVkeSBieSBNYXlvIENsaW5pYyBydW4gZnJvbSAxOTc0LTE5ODQuIFRoZSBmaW5hbCAnU3RhdHVzJyBvZiBlYWNoIHBhdGllbnQgd2FzIG9ic2VydmVkIGluIDE5ODYuICdTdGF0dXMnIHdhcyBlaXRoZXIgRGVhZCwgQ2Vuc29yZWQsIG9yIENlbnNvcmVkIGR1ZSB0byBsaXZlciB0cmFuc3BsYW50LiBBIGxpbmsgdG8gdGhlIG9yaWdpbmFsIHN0dWR5IGlzIGhlcmU6IDxodHRwczovL2ZhY3VsdHkud2FzaGluZ3Rvbi5lZHUvYWJhbnNhbC9TaG9ydENvdXJzZV9EeW5hbWljRGVjaXNpb25NYWtpbmcvRGlja3NvbjE5ODlfTWF5b1BCQ09yaWdpbmFsQXJ0aWNsZS5wZGY+CgpUaGUgZGF0YSBjb250YWlucyB0aGUgZm9sbG93aW5nIGF0dHJpYnV0ZXMgKFtEYXRhIFNvdXJjZV0oaHR0cHM6Ly93d3cua2FnZ2xlLmNvbS9kYXRhc2V0cy9mZWRlc29yaWFuby9jaXJyaG9zaXMtcHJlZGljdGlvbi1kYXRhc2V0L2RhdGEpKToKCjEpICoqSUQqKjogdW5pcXVlIGlkZW50aWZpZXJcCjIpICoqTl9EYXlzKio6IG51bWJlciBvZiBkYXlzIGJldHdlZW4gcmVnaXN0cmF0aW9uIGFuZCB0aGUgZWFybGllciBvZiBkZWF0aCwgdHJhbnNwbGFudGF0aW9uLCBvciBzdHVkeSBhbmFseXNpcyB0aW1lIGluIEp1bHkgMTk4NlwKMykgKipTdGF0dXMqKjogc3RhdHVzIG9mIHRoZSBwYXRpZW50IEMgKGNlbnNvcmVkKSwgQ0wgKGNlbnNvcmVkIGR1ZSB0byBsaXZlciB0eCksIG9yIEQgKGRlYXRoKVwKNCkgKipEcnVnKio6IHR5cGUgb2YgZHJ1ZyBELXBlbmljaWxsYW1pbmUgb3IgcGxhY2Vib1wKNSkgKipBZ2UqKjogYWdlIGluIFtkYXlzXVwKNikgKipTZXgqKjogTSAobWFsZSkgb3IgRiAoZmVtYWxlKVwKNykgKipBc2NpdGVzKio6IHByZXNlbmNlIG9mIGFzY2l0ZXMgTiAoTm8pIG9yIFkgKFllcylcCjgpICoqSGVwYXRvbWVnYWx5Kio6IHByZXNlbmNlIG9mIGhlcGF0b21lZ2FseSBOIChObykgb3IgWSAoWWVzKVwKOSkgKipTcGlkZXJzKio6IHByZXNlbmNlIG9mIHNwaWRlcnMgTiAoTm8pIG9yIFkgKFllcylcCjEwKSAqKkVkZW1hKio6IHByZXNlbmNlIG9mIGVkZW1hIE4gKG5vIGVkZW1hIGFuZCBubyBkaXVyZXRpYyB0aGVyYXB5IGZvciBlZGVtYSksIFMgKGVkZW1hIHByZXNlbnQgd2l0aG91dCBkaXVyZXRpY3MsIG9yIGVkZW1hIHJlc29sdmVkIGJ5IGRpdXJldGljcyksIG9yIFkgKGVkZW1hIGRlc3BpdGUgZGl1cmV0aWMgdGhlcmFweSlcCjExKSAqKkJpbGlydWJpbioqOiBzZXJ1bSBiaWxpcnViaW4gaW4gW21nL2RsXVwKMTIpICoqQ2hvbGVzdGVyb2wqKjogc2VydW0gY2hvbGVzdGVyb2wgaW4gW21nL2RsXVwKMTMpICoqQWxidW1pbioqOiBhbGJ1bWluIGluIFtnbS9kbF1cCjE0KSAqKkNvcHBlcioqOiB1cmluZSBjb3BwZXIgaW4gW3VnL2RheV1cCjE1KSAqKkFsa19QaG9zKio6IGFsa2FsaW5lIHBob3NwaGF0YXNlIGluIFtVL2xpdGVyXVwKMTYpICoqU0dPVCoqOiBTR09UIGluIFtVL21sXVwKMTcpICoqVHJpZ2x5Y2VyaWRlcyoqOiB0cmlnbGljZXJpZGVzIGluIFttZy9kbF1cCjE4KSAqKlBsYXRlbGV0cyoqOiBwbGF0ZWxldHMgcGVyIGN1YmljIFttbC8xMDAwXVwKMTkpICoqUHJvdGhyb21iaW4qKjogcHJvdGhyb21iaW4gdGltZSBpbiBzZWNvbmRzIFtzXVwKMjApICoqU3RhZ2UqKjogaGlzdG9sb2dpYyBzdGFnZSBvZiBkaXNlYXNlICgxLCAyLCAzLCBvciA0KQoKRm9yIHRoZSBiYXNpYyBwcmUtcHJvY2Vzc2luZywgd2UgYmluYXJ5LWVuY29kZWQgdGhlIGNhdGVnb3JpY2FsIHZhcmlhYmxlcyBpbiB0aGUgZGF0YSBzZXQgYW5kIHNldCB0aGVtIGFzIGZhY3RvcnMuCgpgYGB7ciBsb2FkIHBhY2thZ2VzfQoKbGlicmFyeShzdXJ2aXZhbCkKbGlicmFyeShnZ3Bsb3QyKQpsaWJyYXJ5KHN1cnZpdmFsKQpsaWJyYXJ5KHN1cnZtaW5lcikKbGlicmFyeShrYWJsZUV4dHJhKQpsaWJyYXJ5KGZhY3RvZXh0cmEpCgpgYGAKCmBgYHtyfQojbG9hZCBpbiB0aGUgZGF0YQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShrYWJsZSkKI2xvYWQgZGF0YQpjaXJyaG9zaXMgPC0gcmVhZF9jc3YoImNpcnJob3Npcy5jc3YiKQpgYGAKCmBgYHtyfQojZW5jb2RlIHRoZSBzZXgsIGFzY2l0ZXMsIGhlcGF0b21lZ2FseSwgc3BpZGVycywgZWRlbWEgaW50byBiaW5hcnkgdmFyaWFibGVzCmNpcnJob3NpcyRTZXggPC0gaWZlbHNlKGNpcnJob3NpcyRTZXggPT0gIkYiLCAwLCAxKQpjaXJyaG9zaXMkQXNjaXRlcyA8LSBpZmVsc2UoY2lycmhvc2lzJEFzY2l0ZXMgPT0gIlkiLCAxLCAwKQpjaXJyaG9zaXMkSGVwYXRvbWVnYWx5IDwtIGlmZWxzZShjaXJyaG9zaXMkSGVwYXRvbWVnYWx5ID09ICJZIiwgMSwgMCkKY2lycmhvc2lzJFNwaWRlcnMgPC0gaWZlbHNlKGNpcnJob3NpcyRTcGlkZXJzID09ICJZIiwgMSwgMCkKI2ZhY3Rvcml6ZSB0aGUgc3RhZ2UKY2lycmhvc2lzJFN0YWdlIDwtIGZhY3RvcihjaXJyaG9zaXMkU3RhZ2UpCmNpcnJob3NpcyRTdGF0dXMgPC0gZmFjdG9yKGNpcnJob3NpcyRTdGF0dXMpCmNpcnJob3NpcyREcnVnIDwtIGZhY3RvcihjaXJyaG9zaXMkRHJ1ZykKY2lycmhvc2lzJFNleCA8LSBmYWN0b3IoY2lycmhvc2lzJFNleCkKI2NpcnJob3NpcyRBc2NpdGVzIDwtIGZhY3RvcihjaXJyaG9zaXMkQXNjaXRlcykKI2NpcnJob3NpcyRIZXBhdG9tZWdhbHkgPC0gZmFjdG9yKGNpcnJob3NpcyRIZXBhdG9tZWdhbHkpCiNjaXJyaG9zaXMkU3BpZGVycyA8LSBmYWN0b3IoY2lycmhvc2lzJFNwaWRlcnMpCmNpcnJob3NpcyRFZGVtYSA8LSBmYWN0b3IoY2lycmhvc2lzJEVkZW1hKQpjaXJyaG9zaXMkU2V4IDwtIGZhY3RvcihpZmVsc2UoY2lycmhvc2lzJFNleCA9PSAwLCAiRmVtYWxlIiwgIk1hbGUiKSkKCiNEcm9wIHRoZSBmaXJzdCBjb2x1bW4KY2lycmhvc2lzIDwtIGNpcnJob3Npc1ssLTFdCmBgYAoKLSAgIEVuZ2FnZSBpbiBFeHBsb3JhdG9yeSBEYXRhIEFuYWx5c2lzCgotICAgVXNlIE1hY2hpbmUgTGVhcm5pbmcgQWxnb3JpdGhtczoKCiAgICAtICAgWW91IG11c3QgdXNlIGF0IGxlYXN0IG9uZSBvZiBlYWNoOiBhIFJlZ3Jlc3Npb24tYmFzZWQgYWxnb3JpdGhtLCBhIFRyZWUtYmFzZWQgYWxnb3JpdGhtLCBhbmQgYW4gVW5zdXBlcnZpc2VkIExlYXJuaW5nIGFsZ29yaXRobS4KICAgIC0gICBFYWNoIGFsZ29yaXRobSBtdXN0IGJlIGV4cGxhaW5lZCBmb3IgYSBnZW5lcmFsIGF1ZGllbmNlLgogICAgLSAgIEFsbCByZXN1bHRzIHNob3VsZCBiZSBleHBsYWluZWQuCiAgICAtICAgV2hlcmUgYXBwcm9wcmlhdGUsIGNvbXBhcmlzb25zIGJldHdlZW4gbWV0aG9kcyBzaG91bGQgYmUgZGlzY3Vzc2VkLiBUaGlzIGluY2x1ZGVzIGhpZ2hsaWdodGluZyB0aGUgc3RyZW5ndGhzIGFuZCB3ZWFrbmVzc2VzIG9mIHRoZSB2YXJpb3VzIGFwcHJvYWNoZXMgYXMgd2VsbCBhcyB3aGVuIGVhY2ggaXMgYXBwcm9wcmlhdGUuCgotICAgQSBkaXNjdXNzaW9uIG9mIHdoYXQgeW91J3ZlIGxlYXJuZWQgZnJvbSB5b3VyIHdvcmsgYWJvdXQgdGhlIGNvbnRleHQgYW5kIHJlY29tbWVuZGF0aW9ucyBmb3IgZnV0dXJlIHdvcmsuCgotICAgQXV0aG9yIENvbnRyaWJ1dGlvbnMtLWxpc3Qgb3V0IHdobyBkaWQgd2hhdCBpbiB0aGUgcHJvamVjdC4KCi0gICBSZWZlcmVuY2VzLS1DaXRhdGlvbiBzdHlsZSBpcyB5b3VyIGNob2ljZSwgYnV0IGFsbCBzb3VyY2VzIHNob3VsZCBiZSBkb2N1bWVudGVkIChib3RoIGluIHRleHQgYW5kIGluIHRoZSBSZWZlcmVuY2VzIHNlY3Rpb24pLiBUaGlzIGluY2x1ZGVzIHdoZXJlIHlvdSBnb3QgeW91ciBkYXRhLgoKLSAgIEEgY29tbWVudGVkIENvZGUgQXBwZW5kaXgKCmBgYHtyfQoKY2lycmhvc2lzICU+JSAKICBnZ3Bsb3QoYWVzKHggPSBOX0RheXMpKSArIGdlb21faGlzdG9ncmFtKCkgKwogIGZhY2V0X3dyYXAoZmFjZXRzID0gdmFycyhTdGF0dXMpKQoKYGBgCg==</div>
 
 
 

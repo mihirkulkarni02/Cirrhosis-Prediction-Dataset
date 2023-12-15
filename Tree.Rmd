@@ -5,7 +5,7 @@ date: "2023-12-12"
 output: html_document
 ---
 
-# Part I: Classification Algorithm for the Status of the Patient
+# Part I: Classification Algorithm for the Status of the Patient using CART
 
 To address the first sub-goal of this project, we will be exploring the prediction of the status of a patient at the end of the study. Our main objective through this is to gain a stronger understanding of what factors played in the role of the death of the patient. To do this, we will be using Decision Trees. Let us start by exploring what these are and why we chose to use them.
 

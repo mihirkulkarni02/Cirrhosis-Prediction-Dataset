@@ -12,21 +12,50 @@ Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an 
 
 ![[Primary Biliary Cholangitis ([Source](https://www.google.com/search?client=safari&sca_esv=591276386&rls=en&sxsrf=AM9HkKmtJVOC2Jrf2BSYVB2O-QcnTSgx6g:1702664705100&q=Primary+Biliary+Cholangitis&tbm=isch&source=lnms&sa=X&ved=2ahUKEwid0qyniJKDAxX9FFkFHVH3CcoQ0pQJegQIDxAB&biw=1440&bih=848&dpr=2#imgrc=UeV_fhP-8vPOlM))]{.underline}](17715-primary-biliary-cholangitis.webp)
 
+## Why is the data important to us?
+
+Both of us have been very interetsted in the intersection of medicine and machine learning. The idea that the concepts we are learning in our DS majors could have such an impact on the health industry was really special. Another important aspect was that there is so much potential for advancement of medicine, we both agreed that this area is MLs most promising aspect. The cirrhosis data set perticularly stood out to us because the data set included so many interesting attributes and we anted to see how they are connected with the outcomes of the patient.
+
+The data set also includes some important limitations. Most importantly, there are only 418 cases, greatly affecting the types of analysis we could do. This shows realm world problems data scientists face. Thus, our goal is to use our Statistical DS skillset to approach this problem, despite the limitations.
+
 ## Objectives
 
-### Q1: What predictors, if any, increases an individual's chance of receiving a liver transplant?
+Exploring the study, we concluded on two core questions we hope to address in this report:
 
-### Q2: Are there factors not currently included in medical definition that can help distinguish different stages of Biliary Cholangitis?
+### CRQ1: What predictors, if any affected the status of the patient at the end of the study?
+
+### CRQ2: Are there factors not currently included in medical definition that can help distinguish different stages of Biliary Cholangitis?
 
 ## Clinical Study + Dataset Background :
 
-The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984. The final 'Status' of each patient was observed in 1986. 'Status' was either Dead, Censored, or Censored due to liver transplant.
+The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984. The final 'Status' of each patient was observed in 1986. 'Status' was either Dead, Censored, or Censored due to liver transplant. A link to the original study is here: <https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf>
 
-A link to the original study is here: <https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf>
+The data contains the following attributes ([Data Source](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data)):
 
-### Load in Packages
+1) **ID**: unique identifier\
+2) **N_Days**: number of days between registration and the earlier of death, transplantation, or study analysis time in July 1986\
+3) **Status**: status of the patient C (censored), CL (censored due to liver tx), or D (death)\
+4) **Drug**: type of drug D-penicillamine or placebo\
+5) **Age**: age in [days]\
+6) **Sex**: M (male) or F (female)\
+7) **Ascites**: presence of ascites N (No) or Y (Yes)\
+8) **Hepatomegaly**: presence of hepatomegaly N (No) or Y (Yes)\
+9) **Spiders**: presence of spiders N (No) or Y (Yes)\
+10) **Edema**: presence of edema N (no edema and no diuretic therapy for edema), S (edema present without diuretics, or edema resolved by diuretics), or Y (edema despite diuretic therapy)\
+11) **Bilirubin**: serum bilirubin in [mg/dl]\
+12) **Cholesterol**: serum cholesterol in [mg/dl]\
+13) **Albumin**: albumin in [gm/dl]\
+14) **Copper**: urine copper in [ug/day]\
+15) **Alk_Phos**: alkaline phosphatase in [U/liter]\
+16) **SGOT**: SGOT in [U/ml]\
+17) **Triglycerides**: triglicerides in [mg/dl]\
+18) **Platelets**: platelets per cubic [ml/1000]\
+19) **Prothrombin**: prothrombin time in seconds [s]\
+20) **Stage**: histologic stage of disease (1, 2, 3, or 4)
 
-```{r}
+For the basic pre-processing, we binary-encoded the categorical variables in the data set and set them as factors.
+
+```{r load packages}
 
 library(survival)
 library(ggplot2)
@@ -37,17 +66,13 @@ library(factoextra)
 
 ```
 
-### Data Processing
-
 ```{r}
 #load in the data
 library(tidyverse)
+library(kable)
 #load data
 cirrhosis <- read_csv("cirrhosis.csv")
-head(cirrhosis)
 ```
-
-### Pre-process the data
 
 ```{r}
 #encode the sex, ascites, hepatomegaly, spiders, edema into binary variables

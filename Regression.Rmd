@@ -429,7 +429,7 @@ testingData %>%
 
 -   **F1 Score**: Approximately 55.56%
 
-This shows that our model is has struggled with overfitting, with an especially low precision score. We will discuss this in the comparison with the tree model, but this is a limitation of our data size. Lastly, we can plot the separation plot.
+This shows that our model is has struggled with overfitting, with an especially low precision score. We will discuss this in the comparison with the tree model, but this is a limitation of our data size. Lastly, we can plot the separation plot. We can see the separation has increased due to the over fitting we discussed.
 
 ```{r}
 #Sepeation Plot
