@@ -74,7 +74,7 @@ cirrhosisCluster$Age_Years <- round(cirrhosisCluster$Age_Years) #round age to wh
 
 #same for tranplant stuff
 
-
+## DO I NEED THIS DIST??
 ```{r}
 distCirrhosis <- dist(
   x = cirrhosisCluster,
@@ -106,7 +106,7 @@ hybridCirrhosis <- hkmeans(
 ### Making a color palette
 ```{r}
 
-StagesPalette <- c("#AA336A", "#770737", "#40B5AD", "#009E60")
+StagesPalette <- c("#AA336A", "#770737", "#40B5AD", "#009E60", "#9FE2BF")
 
 ```
 
@@ -127,12 +127,43 @@ hkmeans_tree(
 )
 
 ```
+### Testing for optimal k value
+
+```{r}
+# Create scree plot for choosing k ----
+library(factoextra)
+set.seed(380)
+fviz_nbclust(
+  x = cirrhosisCluster,
+  diss = NULL,
+  FUNcluster = kmeans,
+  method = "wss",
+  k.max = 10
+)
+
+
+```
+
+### Trying k = 5
+
+```{r}
+
+hybridCirrhosis2 <- hkmeans(
+  x = cirrhosisCluster,
+  k = 5,
+  hc.metric = "euclidean",
+  hc.method = "ward.D",
+  iter.max = 10
+)
+
+```
+
 
 ```{r}
 # Plot the final dendrogram for hybrid approach ----
 # library(factoextra)
 fviz_dend(
-  x = hybridCirrhosis,
+  x = hybridCirrhosis2,
   cex = 0.4,
   palette = StagesPalette,
   rect = FALSE,
@@ -161,4 +192,18 @@ fviz_cluster(
 
 ```
 
+```{r}
 
+# Plot the final clustering for hybrid approach ----
+# library(factoextra)
+fviz_cluster(
+  object = hybridCirrhosis2,
+  stand = FALSE,
+  geom = "point",
+  main = "Hybrid Cluster Plot"
+) +
+  scale_color_manual(values = StagesPalette) +
+  scale_fill_manual(values = StagesPalette) +
+  theme_bw() 
+
+```
