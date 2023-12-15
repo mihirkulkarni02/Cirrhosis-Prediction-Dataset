@@ -5,26 +5,34 @@ date: "2023-12-12"
 output: html_document
 ---
 
-# Part II: Exploring the predictors for a Liver Transplant using logistic regression 
+# Part II: Exploring the predictors for the patient's status using logistic regression
 
-Next, let us explore our question with a different type of model. To do this, we will be using (binary) logistic regression model
+Next, let us explore our question with a different type of model and compare the results with our tree. To do this, we will be using (binary) logistic regression model.
 
 ## Introduction
 
 Logistic regression is a statistical method used for binary classification, which predicts the probability of an outcome that can be either true or false. This is done by understanding the relationship between a dependent binary variable and one or more independent variables. Logistic regression is easy to implement and interpret. However there are also some drawbacks, the model assumes a linear relationship between the independent variables and the log odds of the dependent variable, which may not always hold true in complex real-world scenarios. Furthermore, unlike the decision tree, linear regression models cannot ignore N/A values.
 
-![Logistic Regression Model ([Source](https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-logistic-regression/))](46-4.png)
+![[Logistic Regression Model ([Source](https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-logistic-regression/))]{.underline}](46-4.png)
 
 ## Methodology
 
 Similar to the tree, we will start by splitting the data set into training and testing sets. Note that the data now only contains instances where the patient was deceased. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing. To allow reproducible code, we have fixed the seed at 380.
 
+With this, we will build two candidate models:
+
+-   The first model will test the classification based on just the SGOT
+
+-   The second model will use a step wise function using various predictors to see the best performance.
+
+Another important consideration is the application of prediction (estimating an outcome based on input variables) and inference (understanding the relationships between variables). We will evaluate the inference through the coefficient analysis and prediction through roc curves and confusion matrix. It is important to note that these metrics will complement each other in our understanding of the data. However, the main focus of this analysis will be prediction and we will work with several metrics to evaluate it.
+
+We will use a variety of tools to understand the model's performance.
+
 ```{r}
 cirrhosisRegression <- cirrhosis
 cirrhosisRegression$Status <- ifelse(cirrhosisRegression$Status == "C" | cirrhosisRegression$Status == "CL", 1, 0)
 ```
-
-### Logistic regression model
 
 ```{r}
 #model data
@@ -39,7 +47,7 @@ LRmodelData <- cirrhosisRegression %>%
 set.seed(380)
 trainingData <- LRmodelData %>%
   group_by(Status) %>%  # group_by() function ensures that the data
-  slice_sample(prop = 0.75)
+  slice_sample(prop = 0.80)
 
 testingData <- LRmodelData %>%
   filter(!(tempID %in% trainingData$tempID))
@@ -50,11 +58,13 @@ trainingResults <- trainingData
 ```{r}
 # Form Candidate Model 1
 model1 <- glm(
-  formula = Status ~ Platelets,
+  formula = Status ~ SGOT,
   data = trainingData,
   family = binomial
 )
 ```
+
+Stepwise results:
 
 ```{r models}
 # Lower bound (Intercept only)
@@ -87,19 +97,14 @@ model2 <- step(
 
 # Results
 
-Initially, we'll delve into the two preliminary models independently to
-understand where they stand. Following that, we'll be deploying the best
-candidate model on our test data. Regarding confusion matrices, we'll
-employ a basic rule: if the predicted probability of a student
-graduating exceeds 0.5, we'll categorize them as having graduated (naïve
-rule).
+Initially, we'll delve into the two preliminary models independently to understand where they stand. Following that, we'll be deploying the best candidate model on our test data. Regarding confusion matrices, we'll employ a basic rule: if the predicted probability of a the patient's status being "deceased" exceeds 0.5, we'll categorize them as deceased (naïve rule).
 
 ## Model 1
 
 ```{r}
 # Model 1 Coefficient Table
 as.data.frame(summary(model1)$coefficients) %>%
-  rownames_to_column(var = "term") %>%
+  rownames_to_column(var = "X") %>%
   rename(coefficient = Estimate) %>% 
   mutate(
     prob_odds = case_when(
@@ -114,21 +119,25 @@ as.data.frame(summary(model1)$coefficients) %>%
       yes = paste("< 0.001"),
       no = `Pr(>|z|)`
     ),
-    term = case_when(
-      term == "(Intercept)" ~ "Intercept",
-      grepl(x = term, pattern = "Platelets") ~ "Platelets"
+    X = case_when(
+      X == "(Intercept)" ~ "Intercept",
+      grepl(x = X, pattern = "SGOT") ~ "SGOT"
     )
   ) %>%
   kable()
 
 ```
 
+This table shows us the results of our first model. We can see that, holding other variables constant, a one-unit increase in SGOT is associated with a decrease in the log-odds of the response variable by 0.0076446. Furthermore, the odds-ratio indicates that for each one-unit increase in SGOT, the odds of the event occurring decrease by about 0.76%.
+
+We can also plot the confusion matrix for this model:
+
 ```{r}
 library(janitor)
 # Building confidence intervals for Model 1 coefficients
 model1CI <- confint(
   object = model1,
-  parm = "Platelets",
+  parm = "SGOT",
   level = 0.9
 )
 
@@ -140,14 +149,14 @@ trainingResults <- trainingData %>%
 trainingResults <- trainingResults %>%
   mutate(
     model1Class = case_when(
-      model1Pred > 0.5 ~ 1,
-      .default = 0
+      model1Pred > 0.5 ~ "Censored",
+      .default = "Deceased"
     )
   )
 
 #Confusion Matrix for Model 1
 trainingResults %>%
-  mutate(Patient_status = ifelse(Status == 1, 1, 0)) %>%
+  mutate(Patient_status = ifelse(Status == 1, "Censored", "Deceased")) %>%
   tabyl(var1 = model1Class, var2 = Patient_status) %>%
   adorn_title(
     placement = "combined",
@@ -158,12 +167,11 @@ trainingResults %>%
     booktabs = TRUE,
     align = "c",
     caption = "Model 1 Confusion Matrix"
-  )
+  )%>%kable_styling(latex_options = "HOLD_position")
 
 ```
 
-Next let us look at our Model 2, which has multiple factors as discussed
-earlier.
+We can see that this model tends to over predict censored values. This shows the need of bringing in more factors. Next let us look at our Model 2, which has multiple factors as discussed earlier.
 
 ```{r}
 #Coeff for model 2
@@ -179,6 +187,8 @@ as.data.frame(summary(model2)$coefficients) %>%
   kable()
 
 ```
+
+This analysis suggests significant associations between several predictors (Bilirubin, Age, Alk_Phos, Prothrombin, Spiders) and the status of the patient. Each predictor, including the Intercept, shows a statistically significant effect, as indicated by their small p-values (Pr(\>\|z\|)). The negative coefficients for Bilirubin, Age, Alk_Phos, Prothrombin, and Spiders imply that increases in these variables are associated with a decrease in the log-odds of the outcome. Bilirubin and Spiders are showing notably strong effects in the model.
 
 ```{r}
 #do the Tukey-Anscombe plot
@@ -204,6 +214,8 @@ ggplot(
   )
 ```
 
+This figure shows us the Tukey-Anscombe plot using Pearson residuals for Model 2. In an ideal fit, the residuals should be evenly distributed about zero with constant mean and variance. The shape of the line suggests that the model is not capturing someunder lying structure in the data, especially in extreme cases.
+
 ```{r}
 #plot the gvif
 as.data.frame(car::vif(model2)) %>%
@@ -218,24 +230,31 @@ as.data.frame(car::vif(model2)) %>%
 
 ```
 
-Here we can see the generalized variance inflation factors for candidate
-Model 2. Multicollinearity is a statistical concept where several
-independent variables in a model are correlated and this is an important
-consideration especially when we deal with so many categories.
+The Variance Inflation Factor (VIF) values for the variables in the model (Bilirubin, Age, Alk_Phos, Prothrombin, Spiders) are all close to 1, indicating minimal multicollinearity. This means that these predictors are relatively independent of each other, enhancing the reliability of the model.
 
 ```{r}
 #Store the predicted and actual values for Model 2
 trainingResults$model2Pred <- predict(model2, type = "response")
-trainingResults$model2Class <- ifelse(trainingResults$model2Pred > 0.5, 1, 0)
-trainingResults$Actual <- ifelse(trainingData$Status == 1, 1, 0)
+trainingResults$model2Class <- ifelse(trainingResults$model2Pred > 0.5, "Censored", "Deceased")
+trainingResults$Actual <- ifelse(trainingData$Status == 1, "Censored", "Deceased")
 
 # Create confusion matrix using table
-confusionMatrix <- table(Predicted = trainingResults$model2Class, Actual = trainingResults$Actual)
+confusionMatrixRegression <- table(Predicted = trainingResults$model2Class, Actual = trainingResults$Actual)
 
-kable(confusionMatrix, caption = "Confusion matrix for Model 2") %>%
+kable(confusionMatrixRegression, caption = "Confusion matrix for Model 2") %>%
   kable_classic(latex_options = "HOLD_position")
 
 ```
+
+From this confusion matrix we can see the relationships between the True Positive, True Negative, False Positive and False Negative values. From this we can calculate:
+
+-   **Accuracy**: Approximately 81.36%
+
+-   **Recall**: Approximately 79.01%
+
+-   **Precision**: Approximately 72.73%
+
+-   **F1 Score**: Approximately 75.74%
 
 Lastly, let us look at the separation plots for each of the models.
 
@@ -271,7 +290,7 @@ model2ROC_df <- data.frame(
 # Convert 'Actual' column to numeric 0/1
 trainingResults <- trainingResults %>%
   mutate(
-    actualNum = if_else(Actual == 0, 0, 1)
+    actualNum = if_else(Actual == "Deceased", 0, 1)
   )
 
 
@@ -305,13 +324,7 @@ separationplot(
 )
 ```
 
-The separation plot assesses the the fit of the model by providing the
-model's ability to predict occurrences with a high probability and
-non-occurrences with low probability. The separation plot above
-separation plot suggests that Model 2 has a reasonably good performance
-in predicting graduates, especially for the observations on the
-left-most side of the plot compared to Model 1 with the training data.
-We will later compare this graph with the testing data.
+The separation plot assesses the the fit of the model by providing the model's ability to predict occurrences with a high probability and non-occurrences with low probability. The separation plot above separation plot suggests that Model 2 has a reasonably good performance in predicting the patient's status, especially for the observations on the left-most side of the plot compared to Model 1 with the training data. We will later compare this graph with the testing data.
 
 Lastly, let us look at the ROC curves for bothe the models.
 
@@ -349,17 +362,9 @@ ggplot(
 
 From the graphs we can interpret that:
 
-Model 1: - Its ROC curve is above the line of no discrimination,
-indicating that the model has some predictive capabilities. - The AUC is
-0.621, which is better than random guessing but suggests there's room
-for improvement.
+Model 1: - Its ROC curve is above the line of no discrimination, indicating that the model has some predictive capabilities. - The AUC is 0.64, which is better than random guessing but suggests there's room for improvement.
 
-Model 2: - The ROC curve for Model 2 is significantly above that of
-Model 1, and much closer to the top-left corner, indicating better
-predictive performance. - The AUC is 0.768, which suggests a "good"
-classification performance, and it's notably better than Model 1. - Its
-ability to discriminate between positive and negative classes is
-superior to that of Model 1.
+Model 2: - The ROC curve for Model 2 is significantly above that of Model 1, and much closer to the top-left corner, indicating better predictive performance. - The AUC is 0.899, which suggests a good classification performance, and it's notably better than Model 1. - Its ability to discriminate between positive and negative classes is superior to that of Model 1.
 
 Lastly, let us plot our influence plot.
 
@@ -368,19 +373,13 @@ Lastly, let us plot our influence plot.
 idCases <- car::influencePlot(model2)
 ```
 
-The influence plot shows several data points with high leverage and
-large residuals, indicating potential outliers. Some observations,
-notably those labeled like "23881," have significant influence on the
-regression model due to their Cook's D values.
+The influence plot shows several data points with high leverage and large residuals, indicating potential outliers. Some observations, notably those labeled like "149," have significant influence on the regression model due to their Cook's D values.
 
 # Testing our model
 
-Using our final model, we now turn to see how well this classifier does
-on our testing data. Recall that we initally set the test data during
-the train test split.
+Using our final model, we now turn to see how well this classifier does on our testing data. Recall that we initally set the test data during the train test split.
 
-The confusion matrix below shows the performance of our model using the
-naïve decision rule.
+The confusion matrix below shows the performance of our model using the naïve decision rule.
 
 ```{r}
 # Set up testing data results
@@ -400,14 +399,14 @@ testingData$predict <- predict(
 testingData <- testingData %>%
   mutate(
     model2Class = case_when(
-      predict > 0.5 ~ 1,
-      .default = 0
+      predict > 0.5 ~ "Censored",
+      .default = "Deceased"
     )
   )
 ```
 
 ```{r}
-testingData$Status <- ifelse(testingData$Status == 1, 1, 0)
+testingData$Status <- ifelse(testingData$Status == 1, "Censored", "Deceased")
 
 # Build Confusion Matrix for Testing Data
 testingData %>%
@@ -422,26 +421,15 @@ testingData %>%
   )
 ```
 
-From the matrix, we can see that the model has the following metrics:
+-   **Accuracy**: Approximately 71.43%
 
--   True Positive (TP): Predicted Graduated and actually Graduated. In
-    this case, 7251.
--   False Positive (FP): Predicted Graduated but actually Not Graduated.
-    In this case, 3505.
--   False Negative (FN): Predicted Not Graduated but actually Graduated.
-    In this case, 1936.
--   True Negative (TN): Predicted Not Graduated and actually Not
-    Graduated. In this case, 5395.
+-   **Recall**: Approximately 76.92%
 
-From this, we can interpret that.
+-   **Precision**: Approximately 43.48%
 
--   Accuracy: Approximately 69.92%
--   Precision: Approximately 67.41%
--   Recall (Sensitivity): Approximately 78.93%
--   F1 Score: Approximately 72.72%
+-   **F1 Score**: Approximately 55.56%
 
-This shows that our model is still capable with new data, with a slight
-reduction to the overall performance.
+This shows that our model is has struggled with overfitting, with an especially low precision score. We will discuss this in the comparison with the tree model, but this is a limitation of our data size. Lastly, we can plot the separation plot.
 
 ```{r}
 #Sepeation Plot
@@ -457,4 +445,3 @@ separationplot(
 )
 
 ```
-

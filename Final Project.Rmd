@@ -4,30 +4,28 @@ output: html_notebook
 authors: "Mihir Kulkarni, Nithika Menon"
 ---
 
-
 # Background
- 
-## What is Biliary Cholangitis? 
 
-Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an autoimmune disease where bile ducts become swollen and inflamed and block the flow of bile. Bile is a substance that aids with digestion. The bile ducts carry bile from the liver to the small intestine. The swelling and inflammation can lead to scarring of the liver which is cirrhosis. Advanced cirrhosis can lead to liver failure or liver cancer. Medication can slow progression. There is no definite cure at this time. 
+## What is Biliary Cholangitis?
 
+Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an autoimmune disease where bile ducts become swollen and inflamed and block the flow of bile. Bile is a substance that aids with digestion. The bile ducts carry bile from the liver to the small intestine. The swelling and inflammation can lead to scarring of the liver which is cirrhosis. Advanced cirrhosis can lead to liver failure or liver cancer. Medication can slow progression. There is no definite cure at this time.
 
-# ASK MIHIR TO PUT IN IMAGES HERE !!!
+![[Primary Biliary Cholangitis ([Source](https://www.google.com/search?client=safari&sca_esv=591276386&rls=en&sxsrf=AM9HkKmtJVOC2Jrf2BSYVB2O-QcnTSgx6g:1702664705100&q=Primary+Biliary+Cholangitis&tbm=isch&source=lnms&sa=X&ved=2ahUKEwid0qyniJKDAxX9FFkFHVH3CcoQ0pQJegQIDxAB&biw=1440&bih=848&dpr=2#imgrc=UeV_fhP-8vPOlM))]{.underline}](17715-primary-biliary-cholangitis.webp)
 
-## Analysis Objectives
+## Objectives
 
 ### Q1: What predictors, if any, increases an individual's chance of receiving a liver transplant?
 
 ### Q2: Are there factors not currently included in medical definition that can help distinguish different stages of Biliary Cholangitis?
 
-
 ## Clinical Study + Dataset Background :
 
 The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984. The final 'Status' of each patient was observed in 1986. 'Status' was either Dead, Censored, or Censored due to liver transplant.
 
-A link to the original study is here: https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf
+A link to the original study is here: <https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf>
 
 ### Load in Packages
+
 ```{r}
 
 library(survival)
@@ -39,10 +37,8 @@ library(factoextra)
 
 ```
 
-
-
-
 ### Data Processing
+
 ```{r}
 #load in the data
 library(tidyverse)
@@ -51,8 +47,8 @@ cirrhosis <- read_csv("cirrhosis.csv")
 head(cirrhosis)
 ```
 
-
 ### Pre-process the data
+
 ```{r}
 #encode the sex, ascites, hepatomegaly, spiders, edema into binary variables
 cirrhosis$Sex <- ifelse(cirrhosis$Sex == "F", 0, 1)
@@ -74,26 +70,22 @@ cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
 cirrhosis <- cirrhosis[,-1]
 ```
 
+-   Engage in Exploratory Data Analysis
 
+-   Use Machine Learning Algorithms:
 
+    -   You must use at least one of each: a Regression-based algorithm, a Tree-based algorithm, and an Unsupervised Learning algorithm.
+    -   Each algorithm must be explained for a general audience.
+    -   All results should be explained.
+    -   Where appropriate, comparisons between methods should be discussed. This includes highlighting the strengths and weaknesses of the various approaches as well as when each is appropriate.
 
+-   A discussion of what you've learned from your work about the context and recommendations for future work.
 
-- Engage in Exploratory Data Analysis
+-   Author Contributions--list out who did what in the project.
 
-- Use Machine Learning Algorithms:
-  - You must use at least one of each: a Regression-based algorithm, a Tree-based algorithm, and an Unsupervised Learning algorithm.
-  - Each algorithm must be explained for a general audience.
-  - All results should be explained.
-  - Where appropriate, comparisons between methods should be discussed. This includes highlighting the strengths and weaknesses of the various approaches as well as when each is appropriate.
-  
-- A discussion of what you’ve learned from your work about the context and recommendations for future work.
+-   References--Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
 
-- Author Contributions–list out who did what in the project.
-
-- References–Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
-
-- A commented Code Appendix
-
+-   A commented Code Appendix
 
 ```{r}
 
