@@ -20,30 +20,10 @@ Logistic regression is a statistical method used for binary classification, whic
 Similar to the tree, we will start by splitting the data set into training and testing sets. Note that the data now only contains instances where the patient was deceased. The training set will be used to train our model, while the testing set will help evaluate its performance. We'll use 80% of the data for training and the remaining 20% for testing. To allow reproducible code, we have fixed the seed at 380.
 
 ```{r}
-cirrhosisLRData <- cirrhosis %>%
-  filter(Status == "D") %>%
-  drop_na()
-
-cirrhosisLRData <- cirrhosisLRData[, -2] #Remove status column
-
-set.seed(380)  #reproducibility
-
-# Sampling 80% 
-train_data <- cirrhosisLRData %>% sample_frac(0.8)
-
-# Getting the remaining 20%
-test_data <- setdiff(cirrhosisLRData, train_data)
-
-```
-
-### Dataset for Regression
-
-```{r}
+#Set up dataset for regression
 cirrhosisRegression <- cirrhosis
-```
 
-```{r}
-
+#Remove all rows where the patient status is D
 cirrhosisRegression <- cirrhosisRegression %>%
                                         filter(Status != "D") %>%
                                                           mutate(Transplant = ifelse(Status == 'C', 0, 1 ))
@@ -53,191 +33,166 @@ cirrhosisRegression <- cirrhosisRegression %>%
 ### Logistic regression model
 
 ```{r}
+#model data
+LRmodelData <- cirrhosisRegression %>%
+  drop_na() %>%
+  mutate(
+    tempID = row_number(),
+    .before = Transplant
+  )
 
-TransplantModel <- glm()
+# Set seed for reproducibility and slice
+set.seed(380)
+trainingData <- LRmodelData %>%
+  group_by(Transplant) %>%  # group_by() function ensures that the data
+  slice_sample(prop = 0.75)
 
+testingData <- LRmodelData %>%
+  filter(!(tempID %in% trainingData$tempID))
 
+trainingResults <- trainingData
 ```
 
-======= \### Step 1: Train basic tree
-
 ```{r}
-LRModel1 <- lm( #train the basic tree
-  formula = N_Days ~ Platelets,
-  data = test_data,
-  na.action = "na.omit"
-)
-
-summary(LRModel1)
-```
-
-### Step 2: Train basic models
-
--   fullModel predicts N_Days using all variables from the train_data
--   interceptModel uses only the intercept from the non-missing data
--   initialModel uses only the intercept from the entire dataset.
-
-```{r}
-fullModel <- lm(
-  formula = N_Days ~ .,
-  data = na.omit(train_data)
-)
-
-interceptModel <- lm(
-  formula = N_Days ~ 1,
-  data = na.omit(train_data)
-)
-
-initialModel <- lm(
-  formula = N_Days ~ 1,
-  data = train_data
+# Form Candidate Model 1
+model1 <- glm(
+  formula = Transplant ~ Platelets,
+  data = trainingData,
+  family = binomial
 )
 ```
 
-##### Calculating RMSE for first model
+```{r models}
+# Lower bound (Intercept only)
+lower <- glm(
+  formula = Transplant ~ 1,
+  data = trainingData,
+  family = binomial
+)
 
-```{r}
-sqrt(mean(residuals(initialModel)^2, na.rm = TRUE))
-```
+# Upper bound 
+upper <- glm(
+  formula = Transplant ~ Status + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
+  data = trainingData,
+  family = binomial
+)
 
-### Step 3: Testing selection models
 
-```{r}
-stepwiseTrainModel <- step(
-  object = initialModel, 
+# Stepwise search
+model2 <- step(
+  object = lower,
   scope = list(
-    lower = initialModel,
-    upper = fullModel
+    lower = lower,
+    upper = upper
   ),
-  data = train_data, 
+  data = trainingData,
   direction = "both",
-  k = log(nrow(na.omit(train_data))),
-  trace = 0
+  k = 2
 )
 ```
 
-Here, we will be trying various algorithms to choose the best features/attributes
+# Results
 
-#### (a) Backward Selection
+Initially, we'll delve into the two preliminary models independently to
+understand where they stand. Following that, we'll be deploying the best
+candidate model on our test data. Regarding confusion matrices, we'll
+employ a basic rule: if the predicted probability of a student
+graduating exceeds 0.5, we'll categorize them as having graduated (naïve
+rule).
 
--   Backward selection is a method of fitting regression models in which the choice of predictive variables is carried out by an automatic procedure.
-
--   step() function is employed to perform backward selection. The fullModel is used as the starting model, and variables are iteratively removed until the model reaches the specification of interceptModel, which only contains the intercept. The data used for this selection process omits any rows with missing values. The direction = backward argument specifies the backward elimination method, and k = 2 determines the penalty for adding a variable. Finally, trace = 0 indicates that the intermediate steps of the selection process won't be printed. The final model after backward selection is stored in ModelBS
-
-summary of backward:
+## Model 1
 
 ```{r}
-ModelBS <- step(
-  object = fullModel,
-  scope = list(
-    lower = interceptModel,
-    upper = fullModel
-  ),
-  data = na.omit(test_data), 
-  direction = "backward",
-  k = 2,
-  trace = 0
+# Model 1 Coefficient Table
+as.data.frame(summary(model1)$coefficients) %>%
+  rownames_to_column(var = "term") %>%
+  rename(coefficient = Estimate) %>% 
+  mutate(
+    prob_odds = case_when(
+      coefficient == "(Intercept)" ~ exp(coefficient)/(1 + exp(coefficient)),
+      .default = exp(coefficient)
+    ),
+    .after = coefficient
+  ) %>%
+  mutate(
+    `Pr(>|z|)` = ifelse(
+      test = `Pr(>|z|)` < 0.001,
+      yes = paste("< 0.001"),
+      no = `Pr(>|z|)`
+    ),
+    term = case_when(
+      term == "(Intercept)" ~ "Intercept",
+      grepl(x = term, pattern = "Platelets") ~ "Platelets"
+    )
+  ) %>%
+  kable()
+
+```
+
+```{r}
+library(janitor)
+# Building confidence intervals for Model 1 coefficients
+model1CI <- confint(
+  object = model1,
+  parm = "Platelets",
+  level = 0.9
 )
 
-# Summary of the final backward selection model ----
-summary(ModelBS)
+trainingResults <- trainingData %>%
+  ungroup() %>%
+  mutate(model1Pred = predict(object = model1, newdata = ., type = "response"))
+
+# Apply naïve rule ----
+trainingResults <- trainingResults %>%
+  mutate(
+    model1Class = case_when(
+      model1Pred > 0.5 ~ 1,
+      .default = 0
+    )
+  )
+
+#Confusion Matrix for Model 1
+trainingResults %>%
+  mutate(Transplant_status = ifelse(Transplant == 1, 1, 0)) %>%
+  tabyl(var1 = model1Class, var2 = Transplant_status) %>%
+  adorn_title(
+    placement = "combined",
+    row_name = "Predicted",
+    col_name = "Actual"
+  ) %>%
+  kable(
+    booktabs = TRUE,
+    align = "c",
+    caption = "Model 1 Confusion Matrix"
+  )
+
 ```
 
-#### (b) Forward Selection
-
--   Forward selection is a type of stepwise regression which begins with an empty model and adds in variables one by one. In each forward step, you add the one variable that gives the single best improvement to your model.
--   The step() function to perform forward model selection. Starting from a basic model (interceptModel), the function iteratively adds predictors from the fullModel if they improve the model fit based on some criterion (in this case, likely AIC with a penalty factor of 2, given by k = 2). The trace = 0 argument suppresses intermediate output, providing a cleaner console output. This technique helps in identifying the most relevant predictors for a regression model in a data-driven manner.
-
-Summary of foward:
+Next let us look at our Model 2, which has multiple factors as discussed
+earlier.
 
 ```{r}
-ModelFS <- step(
-  object = interceptModel,
-  scope = list(
-    lower = interceptModel,
-    upper = fullModel
-  ),
-  data = na.omit(test_data), 
-  direction = "forward",
-  k = 2,
-  trace = 0
-)
+#Coeff for model 2
+as.data.frame(summary(model2)$coefficients) %>%
+  tail(11) %>%
+  rename(coefficient = Estimate) %>% 
+  mutate(
+    prob_odds = case_when(
+      coefficient == "(Intercept)" ~ exp(coefficient)/(1 + exp(coefficient)),
+      TRUE ~ exp(coefficient)
+    ),
+    .after = coefficient
+  ) %>%
+  kable()
 
-# Summary of the final forward selection model ----
-summary(ModelFS)
-```
-
-#### (c) Stepwise
-
--   Stepwise regression is the step-by-step iterative construction of a regression model that involves the selection of independent variables to be used in a final model. It involves adding or removing potential explanatory variables in succession and testing for statistical significance after each iteration.
-
--   the step function conducts stepwise selection for a regression model. Initially, it starts with an interceptModel and evaluates the inclusion or exclusion of predictor variables based on their significance and contribution to the model fit. The scope argument specifies the simplest and most complex models. In this case, the simplest is the interceptModel and the most complex is the fullModel. The selection process can both add and remove predictors based on their importance. The penalty for model complexity is determined by the logarithm of the number of observations.
-
-Summary of stepwise:
-
-```{r}
-# Use Stepwise Selection ---
-ModelSS <- step(
-  object = interceptModel, 
-  scope = list(
-    lower = interceptModel,
-    upper = fullModel
-  ),
-  data = na.omit(test_data), 
-  direction = "both",
-  k = log(nrow(na.omit(test_data))),
-  trace = 0
-)
-
-# Summary of the final stepwise selection model ----
-summary(ModelSS)
 ```
 
 ```{r}
-## Backward Selection testing
-sqrt(mean(residuals(stepwiseTrainModel)^2, na.rm = TRUE))
-```
-
-## Step 4: Results
-
-### Build QQ Plot for the stepwise Train Model
-
-```{r}
-
-library(car)
-car::qqPlot(
-  x = residuals(stepwiseTrainModel),
-  distribution = "norm",
-  id = FALSE,
-  envelope = 0.9,
-  pch = 20,
-  xlab = "Theoretical quantiles",
-  ylab = "Residuals (grams)",
-  main = "Assess Gaussian Errors"
-)
-```
-
-### Calculate Skewness of Residuals from the Stepwise Training Model
-
-```{r}
-library(psych)
-# Sample Skewness ----
-skew(residuals(stepwiseTrainModel))
-```
-
-#### Sample Excess Kurtosis
-
-```{r}
-kurtosi(residuals(stepwiseTrainModel))
-```
-
-#### Built a plot for the model
-
-```{r}
+#do the Tukey-Anscombe plo
 ggplot(
   data = data.frame(
-    residuals = residuals(stepwiseTrainModel),
-    fitted = fitted(stepwiseTrainModel)
+    residuals = residuals(model2, type = "pearson"),
+    fitted = fitted(model2)
   ),
   mapping = aes(x = fitted, y = residuals)
 ) +
@@ -249,100 +204,262 @@ ggplot(
     se = FALSE,
     linewidth = 0.5
   ) +
-  geom_hline(
-    yintercept = mean(residuals(stepwiseTrainModel)),
-    color = "darkgrey",
-    linetype = "solid",
-    linewidth = 1
-  ) +
-  geom_hline(
-    yintercept = 0,
-    color = "red",
-    linetype = "dashed"
-  ) +
   theme_bw() +
   labs(
-    x = "Fitted values (grams)",
-    y = "Residuals (grams)"
+    x = "Fitted",
+    y = "Pearson Residuals"
   )
 ```
 
 ```{r}
-library(car)
-library(dplyr)
-library(knitr)
-library(kableExtra)
+#plot the gvif
+as.data.frame(car::vif(model2)) %>%
+  kable(
+    digits = 3,
+    align = "lcccc",
+    booktab = TRUE,
+    format.args = list(big.mark = ","),
+    table.attr = 'data-quarto-disable-processing="true"',
+    label = "GVIF analsyis"
+  )
 
-# Calculate VIFs
-vif_values <- vif(ModelBS)
+```
 
-# Convert to data frame
-vif_df <- data.frame(
-  Variable = names(vif_values),
-  VIF = as.numeric(vif_values)
+Here we can see the generalized variance inflation factors for candidate
+Model 2. Multicollinearity is a statistical concept where several
+independent variables in a model are correlated and this is an important
+consideration especially when we deal with so many categories.
+
+```{r}
+#Store the predicted and actual values for Model 2
+trainingResults$model2Pred <- predict(model2, type = "response")
+trainingResults$model2Class <- ifelse(trainingResults$model2Pred > 0.5, 1, 0)
+trainingResults$Actual <- ifelse(trainingData$graduated == 1, 1, 0)
+
+# Create confusion matrix using table
+confusionMatrix <- table(Predicted = trainingResults$model2Class, Actual = trainingResults$Actual)
+
+kable(confusionMatrix, caption = "Confusion matrix for Model 2") %>%
+  kable_classic(latex_options = "HOLD_position")
+
+```
+
+Lastly, let us look at the separation plots for each of the models.
+
+```{r}
+# Fit ROC Curves for later
+## Model 1
+model1ROC <- roc(
+  formula = graduated ~ model1Pred,
+  data = trainingResults
+)
+model1ROC_df <- data.frame(
+  threshold = model1ROC$thresholds,
+  sensitivity = model1ROC$sensitivities,
+  specificity = model1ROC$specificities,
+  model = "Model 1"
+)
+## Model 2
+model2ROC <- roc(
+  formula = graduated ~ model2Pred,
+  data = trainingResults
+)
+model2ROC_df <- data.frame(
+  threshold = model2ROC$thresholds,
+  sensitivity = model2ROC$sensitivities,
+  specificity = model2ROC$specificities,
+  model = "Model 2"
+)
+```
+
+```{r}
+# Convert 'Actual' column to numeric 0/1
+trainingResults <- trainingResults %>%
+  mutate(
+    actualNum = if_else(Actual == 0, 0, 1)
+  )
+
+
+#Sepeation Plot
+par(mar = c(4,0,0,0))
+separationplot(
+  pred = trainingResults$model1Pred, 
+  actual = trainingResults$actualNum, 
+  type = "rect",
+  line = TRUE, 
+  lwd2 = 2,
+  show.expected = TRUE, 
+  newplot = FALSE,
+  heading = "Model 1"
 )
 
-# Add squared VIF column
-vif_df <- vif_df %>%
-  mutate(
-    VIF_Squared = VIF^2
-  )
-
-# Display the results
-kable(
-  x = vif_df,
-  digits = 3,
-  align = "cccc",
-  booktab = TRUE,
-  table.attr = 'data-quarto-disable-processing="true"'
-) %>%
-  kableExtra::kable_classic(
-    latex_options = c("HOLD_position"),
-    full_width = FALSE
-  )
-
 ```
 
-### Predictions
-
 ```{r}
-predictVals <- predict(
-  object = stepwiseTrainModel,
-  newdata = test_data
+#Sepeation Plot
+par(mar = c(4,0,0,0))
+separationplot(
+  pred = trainingResults$model2Pred, 
+  actual = trainingResults$actualNum, 
+  type = "rect",
+  line = TRUE, 
+  lwd2 = 2,
+  show.expected = TRUE, 
+  newplot = FALSE,
+  heading = "Model 2"
 )
-
-# Add predictions to data frame and find residuals ----
-test_data$prediction <- predictVals
-test_data <- test_data %>%
-  mutate(
-    residuals = N_Days - prediction
-  )
-
-# Calculate RMSE for Testing Data ----
-rmse_testing <- sqrt(mean(test_data$residuals^2, na.rm = TRUE))
-rmse_testing
 ```
 
-### Plot predictions
+The separation plot assesses the the fit of the model by providing the
+model's ability to predict occurrences with a high probability and
+non-occurrences with low probability. The separation plot above
+separation plot suggests that Model 2 has a reasonably good performance
+in predicting graduates, especially for the observations on the
+left-most side of the plot compared to Model 1 with the training data.
+We will later compare this graph with the testing data.
 
-the blue reference line indicates where predictions match actual values perfectly.
+Lastly, let us look at the ROC curves for bothe the models.
 
 ```{r}
+## Merge into existing data frame
+rocData <- rbind(model1ROC_df, model2ROC_df)
+
+## AUC Data
+aucData <- data.frame(
+  model = c("Model 1", "Model 2"),
+  auc = c(model1ROC$auc, model2ROC$auc)
+)
+```
+
+```{r}
+#ROC plot
 ggplot(
-  data = test_data,
-  mapping = aes(x = N_Days, y = prediction)
+  data = rocData,
+  mapping = aes(x = 1 - specificity, y = sensitivity, color = model)
 ) +
-  geom_point() +
-  geom_abline( 
+  geom_path() +
+  geom_abline(
     slope = 1,
     intercept = 0,
-    color = "blue",
-    linetype = "solid",
-    linewidth = 1
+    linetype = "dotted"
   ) +
-  theme_bw() +
-  labs(
-    x = "Actual",
-    y = "Predicted"
+  geom_text(
+  inherit.aes = FALSE,
+  data = aucData,
+  mapping = aes(label = paste(model, "AUC: \n", round(auc, 3))),
+  x = c(0.25, 0.15),
+  y = c(0.4, 1.05)
+)
+```
+
+From the graphs we can interpret that:
+
+Model 1: - Its ROC curve is above the line of no discrimination,
+indicating that the model has some predictive capabilities. - The AUC is
+0.621, which is better than random guessing but suggests there's room
+for improvement.
+
+Model 2: - The ROC curve for Model 2 is significantly above that of
+Model 1, and much closer to the top-left corner, indicating better
+predictive performance. - The AUC is 0.768, which suggests a "good"
+classification performance, and it's notably better than Model 1. - Its
+ability to discriminate between positive and negative classes is
+superior to that of Model 1.
+
+Lastly, let us plot our influence plot.
+
+```{r}
+# Influence Plot for Model 2
+idCases <- car::influencePlot(model2)
+```
+
+The influence plot shows several data points with high leverage and
+large residuals, indicating potential outliers. Some observations,
+notably those labeled like "23881," have significant influence on the
+regression model due to their Cook's D values.
+
+# Testing our model
+
+Using our final model, we now turn to see how well this classifier does
+on our testing data. Recall that we initally set the test data during
+the train test split.
+
+The confusion matrix below shows the performance of our model using the
+naïve decision rule.
+
+```{r}
+# Set up testing data results
+testingData <- testingData %>%
+  mutate(
+    gradNum = case_when(
+      graduated == 0 ~ 0,
+      graduated == 1 ~ 1
+    ),
+    .after = graduated
+  )
+testingData$predict <- predict(
+  object = model2,
+  newdata = testingData,
+  type = "response"
+)
+testingData <- testingData %>%
+  mutate(
+    model2Class = case_when(
+      predict > 0.5 ~ 1,
+      .default = 0
+    )
   )
 ```
+
+```{r}
+testingData$graduated <- ifelse(testingData$graduated == 1, 1, 0)
+
+# Build Confusion Matrix for Testing Data
+testingData %>%
+  tabyl(var1 = model2Class, var2 = graduated) %>%
+  adorn_title(
+    placement = "combined",
+    row_name = "Predicted",
+    col_name = "Actual"
+  ) %>%
+  kable(
+    caption = "Confusion Matrix for Test data"
+  )
+```
+
+From the matrix, we can see that the model has the following metrics:
+
+-   True Positive (TP): Predicted Graduated and actually Graduated. In
+    this case, 7251.
+-   False Positive (FP): Predicted Graduated but actually Not Graduated.
+    In this case, 3505.
+-   False Negative (FN): Predicted Not Graduated but actually Graduated.
+    In this case, 1936.
+-   True Negative (TN): Predicted Not Graduated and actually Not
+    Graduated. In this case, 5395.
+
+From this, we can interpret that.
+
+-   Accuracy: Approximately 69.92%
+-   Precision: Approximately 67.41%
+-   Recall (Sensitivity): Approximately 78.93%
+-   F1 Score: Approximately 72.72%
+
+This shows that our model is still capable with new data, with a slight
+reduction to the overall performance.
+
+```{r}
+#Sepeation Plot
+par(mar = c(4,0,0,0))
+separationplot(
+  pred = testingData$predict, 
+  actual = testingData$gradNum, 
+  type = "rect",
+  line = TRUE, 
+  lwd2 = 2,
+  show.expected = TRUE, 
+  newplot = FALSE
+)
+
+```
+

@@ -21,30 +21,16 @@ The main advantages of decision trees include their simplicity and interpretabil
 
 For this data, we will be dealing with the Status variable. The Status variable was divided into 3 classes:
 
--   Class 0 (D): The patient didn't survive.
-
--   Class 1 (C): The patient is censored, meaning that the observation period ended without the death being recorded.
-
--   Class 2 (CL): Similar to Class 1, the patient is censored due to liver transplantation.
+-   Class 0 (D): The patient didn't survive by the end of the observation
+-   Class 1 (C): The patient is censored, meaning that the observation period ended without the death being recorded
+-   Class 2 (CL): Similar to Class 1, the patient is censored due to liver transplantation
 
 Thus, we can group Class 1 and 2.
 
-### Dataset for Tree
-
 ```{r}
-
+#Combine C and CL status into one variable and binarize
 cirrhosisTreeData <- cirrhosis
-
-```
-
-### 
-
-```{r}
-
-cirrhosisTreeData <- cirrhosisTreeData %>%
-                                  filter(Status != "D") %>%
-                                                      mutate(Transplant = ifelse(Status == 'C', 0, 1 ))
-
+cirrhosisTreeData$Status <- ifelse(cirrhosisTreeData$Status == "C" | cirrhosisTreeData$Status == "CL", 1, 0)
 ```
 
 ## Methodology
@@ -84,7 +70,7 @@ In this report, I have decided to use {rpart} because it provides more flexibili
 # Grow Graduate tree via rpart package
 library(rpart)
 rPartStatus <- rpart(
-  formula = Transplant ~ Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage + Tryglicerides, 
+  formula = Status ~ Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage + Tryglicerides, 
   data = trainingData,
   method = "class",
   parms = list(split = "information")
@@ -158,7 +144,7 @@ From the graph we can see that a cp of 0.011 is ideal as it is under the horizon
 # Prune the rpart Graduate Tree ----
 rPartStatus2 <- prune(
   tree = rPartStatus,
-  cp = 0.016
+  cp = 0.029
 )
 ```
 
@@ -204,7 +190,7 @@ StatusPrediction$rpart2_pred <- as.factor(StatusPrediction$rpart2_pred)
 # Merge supervision column into predictions data frame ----
 StatusPrediction <- cbind(
   tempID = testingData$tempID,
-  Transplant = testingData$Transplant,
+  Status = testingData$Status,
   StatusPrediction
 )
 ```
@@ -212,14 +198,14 @@ StatusPrediction <- cbind(
 We can evaluate the results of this through a confusion matrix.
 
 ```{r}
-StatusPrediction$Transplant <- factor(StatusPrediction$Transplant)
+StatusPrediction$Status <- factor(StatusPrediction$Status)
 
 library(yardstick)
 
 # Build confusion matrix for second tree model
 conf_matrix <- conf_mat(
   data = StatusPrediction,
-  truth = Transplant,
+  truth = Status,
   estimate = rpart2_pred
 )$table
 
@@ -234,9 +220,9 @@ kable(
 kable_styling(latex_options = "HOLD_position")
 
 
-accuracy <- accuracy(StatusPrediction, Transplant, rpart2_pred)
-specificity <- specificity(StatusPrediction, Transplant, rpart2_pred)
-sensitivity <- sensitivity(StatusPrediction, Transplant, rpart2_pred)
+accuracy <- accuracy(StatusPrediction, Status, rpart2_pred)
+specificity <- specificity(StatusPrediction, Status, rpart2_pred)
+sensitivity <- sensitivity(StatusPrediction, Status, rpart2_pred)
 ```
 
 ```{r}
@@ -312,7 +298,7 @@ modelMetrics %>%
 #Set up the data
 
 # Wrangle the Graduate data to set up training and testing datasets
-modelCirrhosis2 <- cirrhosis %>%
+modelCirrhosis2 <- cirrhosisTreeData %>%
   drop_na() %>%
   mutate(
     tempID = row_number(),
@@ -341,7 +327,7 @@ lower <- glm(
 
 # Upper bound 
 upper <- glm(
-  formula = Status ~ N_Days + Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
+  formula = Status ~ Drug + Age + Sex + Ascites + Hepatomegaly + Spiders + Edema + Bilirubin + Cholesterol + Albumin + Copper + Alk_Phos + SGOT + Platelets + Prothrombin + Stage,
   data = trainingData,
   family = binomial
 )
@@ -386,5 +372,3 @@ metrics_df <- data.frame(
 # Use kable to create the table
 kable(metrics_df, format = "html", caption = "Model Performance Metrics")
 ```
-
-## Discussion
