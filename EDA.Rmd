@@ -113,8 +113,6 @@ cirrhosis %>%
 
 Edema is swelling due to too much liquid trapped in the body's tissues. It's common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases. From the graph we can see a even split between the placebo and drug for Edema status. There is no NA values for Edema persistent despite diuretics. We cannot directly compare it the splits for other statuses given their NA values if known could change the look of the graph.
 
-### mihir choose your preffered graph and explain
-
 ### Survival Analysis Based on Treatment and Stage: How does the survival rate differ among patients at different stages of PBC who received D-penicillamine versus placebo?
 
 This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact. (LOLL this is what the study acc sought to discover)

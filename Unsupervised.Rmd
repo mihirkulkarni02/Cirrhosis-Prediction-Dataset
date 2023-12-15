@@ -34,9 +34,10 @@ We had to pre-process the data for the best performance. First, we removed the '
 ```{r}
 #do the ml, take about observational stages vs now quantify, look into the different variables and what they mean.
 cirrhosisCluster <- cirrhosis
+cirrhosisCluster2 <- na.omit(cirrhosis)
 
 cirrhosisCluster <- cirrhosisCluster %>%                 
-                                  select(-Stage)     
+                                  dplyr::select(-Stage)     
                                               
 cirrhosisCluster <- na.omit(cirrhosisCluster) #cannot have NA values in clustering
 
@@ -60,7 +61,7 @@ cirrhosisCluster$Age_Years <- round(cirrhosisCluster$Age_Years) #round age to wh
                               mutate(NoEdemaORD = ifelse(Edema == 'N' , 1, 0)) %>%
                                         mutate(EdemaANDD = ifelse(Edema == "Y", 1, 0)) %>%
                                                 mutate(EdemaORD = ifelse(Edema == "S", 1, 0)) %>%
-                                                                              select(-Edema)
+                                                                              dplyr::select(-Edema)
                                         
                                     
                           
@@ -209,5 +210,25 @@ fviz_cluster(
   scale_color_manual(values = StagesPalette) +
   scale_fill_manual(values = StagesPalette) +
   theme_bw() 
+
+```
+
+Now we can go back to our initial goal: comparing how the custers compare to the Stage variable
+
+```{r}
+cirrhosisCluster2$cluster <- hybridCirrhosis$cluster
+# Calculate mean (or median, etc.) for each variable in each cluster
+library(dplyr)
+cluster_summary <- cirrhosisCluster2 %>%
+  group_by(cluster) %>%
+  summarise_all(funs(mean(., na.rm = TRUE))) # Replace mean with median or any other function as necessary
+kable(cluster_summary %>% dplyr::select(-Status, -Drug, - Sex, -Edema, -Stage), label = "Cluster Summary")
+ggplot(cirrhosisCluster2, aes(x = factor(cluster), fill = factor(Stage))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Distribution of Stages within Clusters",
+       x = "Cluster",
+       y = "Count",
+       fill = "Stage") +
+  theme_minimal()
 
 ```
