@@ -2,6 +2,7 @@
 title: 'Final Project Report - An exploration of Biliary Cirrhosis and Treatments'
 output:
   pdf_document: default
+  toc: true
 authors: Mihir Kulkarni+Nithika Menon
 ---
 
@@ -20,7 +21,7 @@ knitr::opts_chunk$set(
 
 Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an autoimmune disease where bile ducts become swollen and inflamed and block the flow of bile. Bile is a substance that aids with digestion. The bile ducts carry bile from the liver to the small intestine. The swelling and inflammation can lead to scarring of the liver which is cirrhosis. Advanced cirrhosis can lead to liver failure or liver cancer. Medication can slow progression. There is no definite cure at this time.
 
-![Primary biliary cholangitis (https://www.mayoclinic.org/diseases-conditions/primary-biliary-cholangitis/symptoms-causes/syc-20376874)](diagram.jpeg)
+![Primary biliary cholangitis (<https://www.mayoclinic.org/diseases-conditions/primary-biliary-cholangitis/symptoms-causes/syc-20376874>)](diagram.jpeg)
 
 ## Why is the data important to us?
 
@@ -102,14 +103,6 @@ cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
 
 #Drop the first column
 cirrhosis <- cirrhosis[,-1]
-```
-
-```{r}
-#?????
-cirrhosis %>% 
-  ggplot(aes(x = N_Days)) + geom_histogram() +
-  facet_wrap(facets = vars(Status))
-
 ```
 
 ```{r}
@@ -599,9 +592,7 @@ model1 <- glm(
 )
 ```
 
-Stepwise results:
-
-```{r models}
+```{r results = 'hide'}
 # Lower bound (Intercept only)
 lower <- glm(
   formula = Status ~ 1,
@@ -630,11 +621,11 @@ model2 <- step(
 )
 ```
 
-# Results
+## Results
 
 Initially, we'll delve into the two preliminary models independently to understand where they stand. Following that, we'll be deploying the best candidate model on our test data. Regarding confusion matrices, we'll employ a basic rule: if the predicted probability of a the patient's status being "deceased" exceeds 0.5, we'll categorize them as deceased (naïve rule).
 
-## Model 1
+### Model 1
 
 ```{r}
 # Model 1 Coefficient Table
@@ -707,6 +698,8 @@ trainingResults %>%
 ```
 
 We can see that this model tends to over predict censored values. This shows the need of bringing in more factors. Next let us look at our Model 2, which has multiple factors as discussed earlier.
+
+### Model 2
 
 ```{r}
 #Coeff for model 2
@@ -920,7 +913,7 @@ idCases <- car::influencePlot(model2)
 
 The influence plot shows several data points with high leverage and large residuals, indicating potential outliers. Some observations, notably those labeled like "149," have significant influence on the regression model due to their Cook's D values.
 
-# Testing our model
+## Testing our model
 
 Using our final model, we now turn to see how well this classifier does on our testing data. Recall that we initially set the test data during the train test split.
 
@@ -992,9 +985,31 @@ separationplot(
 
 ```
 
-#Comparison between models
+# Discussion: Comparison between models
 
-Now let us compare the performance of our logistic regression model with a decision tree model. We will use the same train test split as before.
+Let us recall the differences between the two models:
+
+Logistic Regression:
+
+-   Pros: Simple, efficient, good for linear relationships, provides outcome probabilities
+
+-   Cons: Assumes linear decision boundary, struggles with complex relationships, sensitive to imbalanced data
+
+Decision Trees:
+
+-   Pros: Handles non-linear data, easy to interpret, works with mixed data types, non-parametric, N/A values
+
+-   Cons: Prone to overfitting, sensitive to data changes, poor at extrapolation, biased with imbalanced datasets
+
+Now let us compare the performance of our logistic regression model with a decision tree model.
+
+| Testing Data Score | CART-based approach | Regression based Approach |
+|--------------------|---------------------|---------------------------|
+| Accuracy           | 72.9%               | 71.43%                    |
+| Precision          | 57.6%               | 43.48%                    |
+| Recall             | 82.70%              | 76.92%                    |
+
+We can see that for this data, surprisingly, the tree based approach had better results. This is an uncommon observation. We believe this was because of the sparcity of the data and how the rows N/A values prevented over fitting with the small data size.
 
 # Part III: Exploring the sub-clusters of the cirrhosis data using unsupervised learning
 
@@ -1204,10 +1219,10 @@ fviz_cluster(
 
 ```
 
-Now we can go back to our initial goal: comparing how the custers compare to the Stage variable
+Now we can go back to our initial goal: comparing how the clusters compare to the Stage variable.
 
 ```{r}
-cirrhosisCluster2$cluster <- hybridCirrhosis$cluster
+cirrhosisCluster2$cluster <- hybridCirrhosis2$cluster
 # Calculate mean (or median, etc.) for each variable in each cluster
 library(dplyr)
 cluster_summary <- cirrhosisCluster2 %>%
@@ -1224,13 +1239,35 @@ ggplot(cirrhosisCluster2, aes(x = factor(cluster), fill = factor(Stage))) +
 
 ```
 
-We can see that the clusters are not evenly distributed. This is a good sign, as it means that the clusters are not just a random grouping of the data.
+We can see that the clusters have a somewhat connection to the Stage, but is not as direct as we hypothesized. We were also able to find the cluster summary compared to the rest of the variables and were able to plot that into a table.
 
 # Discussion
 
+To conclude, in this report, we were able to explore Biliary Cirrhosis and Treatments through various angles. Though our clustering we were able to find new patterns among the data. Though the logistic and CART algorithms we were able to build models that were able to predict the chance of a patient's death using various predictors.
+
+Along with the analysis in the report project, we attempted to explore various models such as predicting the likelihood of a liver transplant and the number of days until an event. However, due to our data's and report's limitations, such as the limited data quantities, we were unable to get concrete solutions. We hope that our results can be used to build even better models, making healthcare more inclusive, efficient and affordable.
+
 # Author Contributions
 
-# References--Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
+We collaborated throughout the document using GitHub, but here are the main responsibilities:
+
+**Introduction: Nithika**
+
+**EDA: Nithika**
+
+**Tree: Mihir**
+
+**Logistic Regression: Mihir**
+
+**Clustering: Nithika**
+
+**Discussion: Mihir**
+
+# References
+
+Dataset: <https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data>
+
+Study: <https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf>
 
 \newpage
 
