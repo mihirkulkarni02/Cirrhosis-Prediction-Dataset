@@ -114,6 +114,22 @@ library(survminer)
 
 ```
 
+## Goals
+
+Our goal is to explore the data through multiple approaches including regression, classification and clustering. Let us frist clear some definitions and differences overall.
+
+[Unsupervised vs Supervised learning]{.underline}
+
+-   **Supervised Learning:** Involves training a model on a labeled dataset, where the correct answers are provided, allowing the model to learn the relationships between the input data and output labels.
+
+-   **Unsupervised Learning:** Involves training a model on data without labeled responses, enabling the model to identify patterns and structures in the data on its own.
+
+[Regression vs Clustering]{.underline}
+
+-   **Regression Learning**: A type of machine learning where the model predicts a continuous output. For example, predicting house prices based on features like size and location.
+
+-   **Classification Learning**: A type of machine learning where the model categorizes data into discrete classes. For example, determining if an email is spam or not based on its content.
+
 # Exploratory Data Analysis
 
 ## Part 1: Exploring the demographics of the patients
@@ -403,7 +419,7 @@ fancyRpartPlot(
 )
 ```
 
-We ca see the pruned tree has cut out some leaf nodes. This would help in avoiding overfitting the model.
+We ca see the pruned tree has cut out some leaf nodes. This would help in avoiding overfitting the model. As a reminder, Overfitting is when a model learns the detail and noise in the training data to the extent that it negatively impacts the performance of the model on new data.
 
 ### Part 4: Results
 
