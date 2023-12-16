@@ -25,9 +25,8 @@ Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an 
 
 ## Why is the data important to us?
 
-Both of us have been very interetsted in the intersection of medicine and machine learning. The idea that the concepts we are learning in our DS majors could have such an impact on the health industry was really special. Another important aspect was that there is so much potential for advancement of medicine, we both agreed that this area is MLs most promising aspect. The cirrhosis data set perticularly stood out to us because the data set included so many interesting attributes and we anted to see how they are connected with the outcomes of the patient.
 
-The data set also includes some important limitations. Most importantly, there are only 418 cases, greatly affecting the types of analysis we could do. This shows realm world problems data scientists face. Thus, our goal is to use our Statistical DS skillset to approach this problem, despite the limitations.
+We are very interested in the intersection of medicine and machine learning. To us, clinical research is engaging and interesting to learn about. It is also special because of the impact it can have on the healthcare industry. There is so much potential for advancement of medicine using AI, and we are passionate about this. The 'cirrhosis' data set stood out to us because the data set included many diverse attributes. A limitation was that this dataset had only 418 cases. This reflects a very probable issue when using clinical data. Thus, our goal is to use our Statistical DS skillet to approach this problem despite its limitations.
 
 ## Objectives
 
@@ -39,9 +38,9 @@ Exploring the study, we concluded on two core questions we hope to address in th
 
 ## Clinical Study + Dataset Background :
 
-The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984. The final 'Status' of each patient was observed in 1986. 'Status' was either Dead, Censored, or Censored due to liver transplant. A link to the original study is here: <https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf>
+The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984. The final 'Status' of each patient was observed in 1986. 'Status' was either Dead, Censored, or Censored due to liver transplant. A link to the original study is in our references. 
 
-The data contains the following attributes ([Data Source](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data)):
+
 
 1)  **ID**: unique identifier\
 2)  **N_Days**: number of days between registration and the earlier of death, transplantation, or study analysis time in July 1986\
@@ -116,7 +115,7 @@ library(survminer)
 
 ## Goals
 
-Our goal is to explore the data through multiple approaches including regression, classification and clustering. Let us frist clear some definitions and differences overall.
+Our goal is to explore the data through our research questions while demonstrating our understandings of including regression, classification and clustering. Let us first clear some definitions and differences overall.
 
 [Unsupervised vs Supervised learning]{.underline}
 
@@ -126,7 +125,7 @@ Our goal is to explore the data through multiple approaches including regression
 
 [Regression vs Clustering]{.underline}
 
--   **Regression Learning**: A type of machine learning where the model predicts a continuous output. For example, predicting house prices based on features like size and location.
+-   **Regression Learning(logistic)**:Logistic regression is a process of modeling the probability of a dichotomous outcome given an input variable.
 
 -   **Classification Learning**: A type of machine learning where the model categorizes data into discrete classes. For example, determining if an email is spam or not based on its content.
 
@@ -229,27 +228,15 @@ cirrhosis %>%
 
 Edema is swelling due to too much liquid trapped in the body's tissues. It's common complication in liver diseases and can significantly impact patient quality of life and survival. Understanding how different levels of edema (none, controlled by diuretics, or persistent despite treatment) affect survival can inform patient management strategies and highlight the need for aggressive interventions in certain cases. From the graph we can see a even split between the placebo and drug for Edema status. There is no NA values for Edema persistent despite diuretics. We cannot directly compare it the splits for other statuses given their NA values if known could change the look of the graph.
 
-### Survival Analysis Based on Treatment and Stage: How does the survival rate differ among patients at different stages of PBC who received D-penicillamine versus placebo?
 
-This question investigates the effectiveness of the drug D-penicillamine compared to a placebo, considering the stage of PBC. By analyzing survival rates across different disease stages and treatment types, we can assess the drug's effectiveness at various disease stages. This information is vital for clinicians to make informed decisions about treatment plans and for researchers to understand the drug's impact.
-
-```{r}
-surv_object <- Surv(cirrhosis$N_Days, cirrhosis$Status == 'D')
-surv_fit <- survfit(surv_object ~ cirrhosis$Drug + cirrhosis$Stage, data = cirrhosis)
-ggsurvplot(surv_fit, 
-           data = cirrhosis,
-           conf.int = TRUE, 
-           #palette = c("#00AFBB", "#E7B800", "#FC4E07"),
-           xlab = "Days", 
-           ylab = "Survival Probability", 
-           title = "Survival Curves by Treatment and Stage")
-```
 
 ### Impact of Liver Complications on Survival: How do the presence of ascites, hepatomegaly, and spiders relate to survival time?
 
-Exploring how liver-related symptoms (ascites, hepatomegaly, and spiders) affect patient survival provides insights into the severity of these complications in PBC progression. This can help in identifying high-risk patients and understanding the disease's impact on liver function.
+Exploring how liver-related conditions (ascites, hepatomegaly, and spiders) affect patient survival provides insights into the severity of these complications in PBC progression. 
 
 ```{r}
+
+surv_object <- Surv(cirrhosis$N_Days, cirrhosis$Status == 'D')
 surv_fit_complications <- survfit(surv_object ~ cirrhosis$Ascites + cirrhosis$Hepatomegaly + cirrhosis$Spiders, data = cirrhosis)
 ggsurvplot(surv_fit_complications, 
            data = cirrhosis,
@@ -260,13 +247,13 @@ ggsurvplot(surv_fit_complications,
            title = "Survival Curves by Liver Complications")
 ```
 
-### Correlation between Biochemical Markers and Disease Stage: What is the correlation between biochemical markers (Bilirubin, Cholesterol, Albumin, Copper, Alk_Phos, SGOT, Triglycerides) and the histologic stage of the disease?
+Survival Curves are commonly used in medical research to measure the ability of a patient to survive. There was a survivial curve in the original study. Out of curiosity, we attempted one here. The combination of of Ascites, Hepatomegaly, and Spiders shows many overlapping curves with often large variation. The labels cut off here, but this is more of a visual exploration. 
 
-This analysis is crucial to understand how different biochemical markers correlate with the disease's progression. Such correlations can aid in the early detection of disease severity, help in monitoring the disease progression, and potentially guide treatment adjustments.
+
 
 # Part I: Classification Algorithm for the Status of the Patient using CART
 
-To address the first sub-goal of this project, we will be exploring the prediction of the status of a patient at the end of the study. Our main objective through this is to gain a stronger understanding of what factors played in the role of the death of the patient. To do this, we will be using Decision Trees. Let us start by exploring what these are and why we chose to use them.
+To address the first sub-goal of this project, we will be exploring the prediction of the status of a patient at the end of the study. Our main objective through this is to gain a stronger understanding of what factors played in the role of the death of the patient. To do this, we will be using Decision Trees. 
 
 ## Introduction
 
@@ -555,7 +542,7 @@ Next, let us explore our question with a different type of model and compare the
 
 ## Introduction
 
-Logistic regression is a statistical method used for binary classification, which predicts the probability of an outcome that can be either true or false. This is done by understanding the relationship between a dependent binary variable and one or more independent variables. Logistic regression is easy to implement and interpret. However there are also some drawbacks, the model assumes a linear relationship between the independent variables and the log odds of the dependent variable, which may not always hold true in complex real-world scenarios. Furthermore, unlike the decision tree, linear regression models cannot ignore N/A values.
+Logistic regression is a statistical method used for binary classification, which predicts the probability of an outcome that can be either true or false. This is done by understanding the relationship between a dependent binary variable and one or more independent variables. Logistic regression is easy to implement and interpret. However there are also some drawbacks, the model assumes a linear relationship between the independent variables and the log odds of the dependent variable, which may not always hold true in complex real-world scenarios. Furthermore, unlike the decision tree, regression models cannot ignore N/A values.
 
 ![[Logistic Regression Model (Source:]{.underline} <https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-logistic-regression/>[)]{.underline}](46-4.png)
 
@@ -1051,10 +1038,9 @@ An important motivation for this part of the study is explore how does "Stage" w
 
 ## Pre-processing the data
 
-We had to pre-process the data for the best performance. First, we removed the 'Stage' column to avoid using outcome-related features in the unsupervised learning. The rows with N/A values were also removed. Lastly, we transformed various categorical variables into numeric formats, which is necessary for clustering algorithms.
+We had to pre-process the data for the best performance. First, we removed the 'Stage' column to avoid using outcome-related features in the unsupervised learning. The rows with N/A values were also removed. Lastly, we transformed various categorical variables into numeric formats which is the easiest way to deal with them in clustering algorithms.
 
 ```{r}
-#do the ml, take about observational stages vs now quantify, look into the different variables and what they mean.
 cirrhosisCluster <- cirrhosis
 cirrhosisCluster2 <- na.omit(cirrhosis)
 
@@ -1066,13 +1052,6 @@ cirrhosisCluster <- na.omit(cirrhosisCluster) #cannot have NA values in clusteri
 cirrhosisCluster$Age_Years <- round(cirrhosisCluster$Age_Years) #round age to whole numbers
 
 
-#reode sex... recode others later if need be #female is 0
-
-#cirrhosisCluster  <- cirrhosisCluster %>%
-#  select( -c(Status, Drug, Edema)) %>%
-  
-# mutate(Sex = ifelse(Sex == 'Female', 0, 1))
-     
       
   cirrhosisCluster  <- cirrhosisCluster %>%
     mutate(Sex = ifelse(Sex == 'Female', 0, 1)) %>%
@@ -1085,22 +1064,7 @@ cirrhosisCluster$Age_Years <- round(cirrhosisCluster$Age_Years) #round age to wh
                                                 mutate(EdemaORD = ifelse(Edema == "S", 1, 0)) %>%
                                                                               dplyr::select(-Edema)
                                         
-                                    
                           
-
-#Data is already factored
-     
-#mutate(Sex = ifelse(Sex == 'Female', 0, 1)) %>%
-  
-   #mutate(Status = ifelse(Status %in% c('C', 'CL'), 0 , 1)) %>%
-          #    mutate(Drug = ifelse(Drug == "D-penicillamine", 0, 1))
-
-  
-#???:
-  
-#make column yes no edema #then yes no under treatment
-
-#same for transplant stuff
 ```
 
 ```{r}
@@ -1129,7 +1093,7 @@ hybridCirrhosis <- hkmeans(
 
 ## Results
 
-We were able to visualize the results of the k-means algorithm. The first step was making a color palette and plotting the dendrogram tree.
+We were able to visualize the results of the k-means algorithm. We created a new color palette and plotted the dendrogram.
 
 ```{r}
 
@@ -1239,12 +1203,11 @@ Now we can go back to our initial goal: comparing how the clusters compare to th
 
 ```{r}
 cirrhosisCluster2$cluster <- hybridCirrhosis2$cluster
-# Calculate mean (or median, etc.) for each variable in each cluster
-library(dplyr)
+#library(dplyr)
 cluster_summary <- cirrhosisCluster2 %>%
   group_by(cluster) %>%
   summarise_all(funs(mean(., na.rm = TRUE))) # Replace mean with median or any other function as necessary
-kable(cluster_summary %>% dplyr::select(-Status, -Drug, - Sex, -Edema, -Stage), label = "Cluster Summary")
+kable(cluster_summary %>% dplyr::select(-Status, -Drug, - Sex, -Edema,-Stage), label = "Cluster Summary")
 ggplot(cirrhosisCluster2, aes(x = factor(cluster), fill = factor(Stage))) +
   geom_bar(position = "dodge") +
   labs(title = "Distribution of Stages within Clusters",
@@ -1254,14 +1217,18 @@ ggplot(cirrhosisCluster2, aes(x = factor(cluster), fill = factor(Stage))) +
   theme_minimal()
 
 ```
+From the table, we see the mean values for each variable belonging to each group.Group 5, for instance, has the largest mean value for Cholestorol.
 
-We can see that the clusters have a somewhat connection to the Stage, but is not as direct as we hypothesized. We were also able to find the cluster summary compared to the rest of the variables and were able to plot that into a table.
+
+From the graph, we can see that the breakdown of the different stages in our clusters. It's important to note that the amount of patients with each stage was not equal in that data and that is shown here. However, there are new observations to be made as our findings produced 5 clusters. 
+
 
 # Discussion
 
-To conclude, in this report, we were able to explore Biliary Cirrhosis and Treatments through various angles. Though our clustering we were able to find new patterns among the data. Though the logistic and CART algorithms we were able to build models that were able to predict the chance of a patient's death using various predictors.
+To conclude, in this report, we were able to explore Biliary Cirrhosis and Treatments through various angles. We were able to build two different kinds of models: decision tree and logistic regression models. Bilirubin, Age, and Prothrombin were strong predictors to predict the status of the patient. From our clustering algorithm, we were able to create 5 clusters for our data and compared it with the stages of the patients.
 
-Along with the analysis in the report project, we attempted to explore various models such as predicting the likelihood of a liver transplant and the number of days until an event. However, due to our data's and report's limitations, such as the limited data quantities, we were unable to get concrete solutions. We hope that our results can be used to build even better models, making healthcare more inclusive, efficient and affordable.
+
+Along with the analysis in the report project, we attempted to explore various models such as predicting the likelihood of a liver transplant and the number of days until an event. However, due to our data's and report's limitations, such as the limited data quantities, we were unable to get concrete solutions. s 
 
 # Author Contributions
 
@@ -1281,9 +1248,20 @@ We collaborated throughout the document using GitHub, but here are the main resp
 
 # References
 
-Dataset: <https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data>
+Fedesoriano. (2021, August 2). Cirrhosis prediction dataset. Kaggle. https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data 
 
-Study: <https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf>
+
+Dickson, et. al. (n.d.). Prognosis in primary biliary cirrhosis: Model for decision making. Prognosis in Primary Biliary Cirrhosis: Model for Decision Making. https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf 
+
+Penn Medicine. (n.d.). Primary Biliary Cirrhosis. Pennmedicine.org. https://www.pennmedicine.org/for-patients-and-visitors/patient-information/conditions-treated-a-to-z/primary-biliary-cirrhosis#:~:text=All%20of%20the%20bile%20ducts,This%20is%20called%20biliary%20cirrhosis. 
+
+
+Mayo Foundation for Medical Education and Research. (2023, November 14). Primary biliary cholangitis. Mayo Clinic. https://www.mayoclinic.org/diseases-conditions/primary-biliary-cholangitis/symptoms-causes/syc-20376874 
+
+
+professional, C. C. medical. (n.d.). Primary biliary cholangitis: What it is, symptoms, treatment. Cleveland Clinic. https://my.clevelandclinic.org/health/diseases/17715-primary-biliary-cholangitis-pbc 
+
+
 
 \newpage
 
