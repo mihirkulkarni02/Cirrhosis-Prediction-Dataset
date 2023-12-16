@@ -116,21 +116,21 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={Submission},
+  pdftitle={Regression-based},
+  pdfauthor={Mihir Kulkarni, Nithika Menon},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\title{Submission}
-\author{}
-\date{\vspace{-2.5em}}
+\title{Regression-based}
+\author{Mihir Kulkarni, Nithika Menon}
+\date{2023-12-12}
 
 \begin{document}
 \maketitle
 
-{
-\setcounter{tocdepth}{2}
-\tableofcontents
-}
+\#Final Project Report-An exploration of Biliary Cirrhosis and
+Treatments
+
 \hypertarget{background}{%
 \section{Background}\label{background}}
 
@@ -154,18 +154,40 @@ cure at this time.
 (\href{https://www.google.com/search?client=safari\&sca_esv=591276386\&rls=en\&sxsrf=AM9HkKmtJVOC2Jrf2BSYVB2O-QcnTSgx6g:1702664705100\&q=Primary+Biliary+Cholangitis\&tbm=isch\&source=lnms\&sa=X\&ved=2ahUKEwid0qyniJKDAxX9FFkFHVH3CcoQ0pQJegQIDxAB\&biw=1440\&bih=848\&dpr=2\#imgrc=UeV_fhP-8vPOlM}{Source})}}
 \end{figure}
 
+\hypertarget{why-is-the-data-important-to-us}{%
+\subsection{Why is the data important to
+us?}\label{why-is-the-data-important-to-us}}
+
+Both of us have been very interetsted in the intersection of medicine
+and machine learning. The idea that the concepts we are learning in our
+DS majors could have such an impact on the health industry was really
+special. Another important aspect was that there is so much potential
+for advancement of medicine, we both agreed that this area is MLs most
+promising aspect. The cirrhosis data set perticularly stood out to us
+because the data set included so many interesting attributes and we
+anted to see how they are connected with the outcomes of the patient.
+
+The data set also includes some important limitations. Most importantly,
+there are only 418 cases, greatly affecting the types of analysis we
+could do. This shows realm world problems data scientists face. Thus,
+our goal is to use our Statistical DS skillset to approach this problem,
+despite the limitations.
+
 \hypertarget{objectives}{%
 \subsection{Objectives}\label{objectives}}
 
-\hypertarget{q1-what-predictors-if-any-increases-an-individuals-chance-of-receiving-a-liver-transplant}{%
-\subsubsection{Q1: What predictors, if any, increases an individual's
-chance of receiving a liver
-transplant?}\label{q1-what-predictors-if-any-increases-an-individuals-chance-of-receiving-a-liver-transplant}}
+Exploring the study, we concluded on two core questions we hope to
+address in this report:
 
-\hypertarget{q2-are-there-factors-not-currently-included-in-medical-definition-that-can-help-distinguish-different-stages-of-biliary-cholangitis}{%
-\subsubsection{Q2: Are there factors not currently included in medical
+\hypertarget{crq1-what-predictors-if-any-affected-the-status-of-the-patient-at-the-end-of-the-study}{%
+\subsubsection{CRQ1: What predictors, if any affected the status of the
+patient at the end of the
+study?}\label{crq1-what-predictors-if-any-affected-the-status-of-the-patient-at-the-end-of-the-study}}
+
+\hypertarget{crq2-are-there-factors-not-currently-included-in-medical-definition-that-can-help-distinguish-different-stages-of-biliary-cholangitis}{%
+\subsubsection{CRQ2: Are there factors not currently included in medical
 definition that can help distinguish different stages of Biliary
-Cholangitis?}\label{q2-are-there-factors-not-currently-included-in-medical-definition-that-can-help-distinguish-different-stages-of-biliary-cholangitis}}
+Cholangitis?}\label{crq2-are-there-factors-not-currently-included-in-medical-definition-that-can-help-distinguish-different-stages-of-biliary-cholangitis}}
 
 \hypertarget{clinical-study-dataset-background}{%
 \subsection{Clinical Study + Dataset Background
@@ -174,12 +196,64 @@ Cholangitis?}\label{q2-are-there-factors-not-currently-included-in-medical-defin
 The dataset is produced from a clinical study by Mayo Clinic run from
 1974-1984. The final `Status' of each patient was observed in 1986.
 `Status' was either Dead, Censored, or Censored due to liver transplant.
-
 A link to the original study is here:
 \url{https://faculty.washington.edu/abansal/ShortCourse_DynamicDecisionMaking/Dickson1989_MayoPBCOriginalArticle.pdf}
 
-\hypertarget{load-in-packages}{%
-\subsubsection{Load in Packages}\label{load-in-packages}}
+The data contains the following attributes
+(\href{https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data}{Data
+Source}):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\tightlist
+\item
+  \textbf{ID}: unique identifier\\
+\item
+  \textbf{N\_Days}: number of days between registration and the earlier
+  of death, transplantation, or study analysis time in July 1986\\
+\item
+  \textbf{Status}: status of the patient C (censored), CL (censored due
+  to liver tx), or D (death)\\
+\item
+  \textbf{Drug}: type of drug D-penicillamine or placebo\\
+\item
+  \textbf{Age}: age in {[}days{]}\\
+\item
+  \textbf{Sex}: M (male) or F (female)\\
+\item
+  \textbf{Ascites}: presence of ascites N (No) or Y (Yes)\\
+\item
+  \textbf{Hepatomegaly}: presence of hepatomegaly N (No) or Y (Yes)\\
+\item
+  \textbf{Spiders}: presence of spiders N (No) or Y (Yes)\\
+\item
+  \textbf{Edema}: presence of edema N (no edema and no diuretic therapy
+  for edema), S (edema present without diuretics, or edema resolved by
+  diuretics), or Y (edema despite diuretic therapy)\\
+\item
+  \textbf{Bilirubin}: serum bilirubin in {[}mg/dl{]}\\
+\item
+  \textbf{Cholesterol}: serum cholesterol in {[}mg/dl{]}\\
+\item
+  \textbf{Albumin}: albumin in {[}gm/dl{]}\\
+\item
+  \textbf{Copper}: urine copper in {[}ug/day{]}\\
+\item
+  \textbf{Alk\_Phos}: alkaline phosphatase in {[}U/liter{]}\\
+\item
+  \textbf{SGOT}: SGOT in {[}U/ml{]}\\
+\item
+  \textbf{Triglycerides}: triglicerides in {[}mg/dl{]}\\
+\item
+  \textbf{Platelets}: platelets per cubic {[}ml/1000{]}\\
+\item
+  \textbf{Prothrombin}: prothrombin time in seconds {[}s{]}\\
+\item
+  \textbf{Stage}: histologic stage of disease (1, 2, 3, or 4)
+\end{enumerate}
+
+For the basic pre-processing, we binary-encoded the categorical
+variables in the data set and set them as factors.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -215,9 +289,6 @@ A link to the original study is here:
 \begin{verbatim}
 ## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa
 \end{verbatim}
-
-\hypertarget{data-processing}{%
-\subsubsection{Data Processing}\label{data-processing}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -259,30 +330,6 @@ A link to the original study is here:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{head}\NormalTok{(cirrhosis)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## # A tibble: 6 x 20
-##      ID N_Days Status Drug          Age Sex   Ascites Hepatomegaly Spiders Edema
-##   <dbl>  <dbl> <chr>  <chr>       <dbl> <chr> <chr>   <chr>        <chr>   <chr>
-## 1     1    400 D      D-penicill~ 21464 F     Y       Y            Y       Y    
-## 2     2   4500 C      D-penicill~ 20617 F     N       Y            Y       N    
-## 3     3   1012 D      D-penicill~ 25594 M     N       N            N       S    
-## 4     4   1925 D      D-penicill~ 19994 F     N       Y            Y       S    
-## 5     5   1504 CL     Placebo     13918 F     N       Y            Y       N    
-## 6     6   2503 D      Placebo     24201 F     N       Y            N       N    
-## # i 10 more variables: Bilirubin <dbl>, Cholesterol <dbl>, Albumin <dbl>,
-## #   Copper <dbl>, Alk_Phos <dbl>, SGOT <dbl>, Tryglicerides <dbl>,
-## #   Platelets <dbl>, Prothrombin <dbl>, Stage <dbl>
-\end{verbatim}
-
-\hypertarget{pre-process-the-data}{%
-\subsubsection{Pre-process the data}\label{pre-process-the-data}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{\#encode the sex, ascites, hepatomegaly, spiders, edema into binary variables}
 \NormalTok{cirrhosis}\SpecialCharTok{$}\NormalTok{Sex }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(cirrhosis}\SpecialCharTok{$}\NormalTok{Sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{)}
 \NormalTok{cirrhosis}\SpecialCharTok{$}\NormalTok{Ascites }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(cirrhosis}\SpecialCharTok{$}\NormalTok{Ascites }\SpecialCharTok{==} \StringTok{"Y"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
@@ -304,41 +351,9 @@ A link to the original study is here:
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\item
-  Engage in Exploratory Data Analysis
-\item
-  Use Machine Learning Algorithms:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    You must use at least one of each: a Regression-based algorithm, a
-    Tree-based algorithm, and an Unsupervised Learning algorithm.
-  \item
-    Each algorithm must be explained for a general audience.
-  \item
-    All results should be explained.
-  \item
-    Where appropriate, comparisons between methods should be discussed.
-    This includes highlighting the strengths and weaknesses of the
-    various approaches as well as when each is appropriate.
-  \end{itemize}
-\item
-  A discussion of what you've learned from your work about the context
-  and recommendations for future work.
-\item
-  Author Contributions--list out who did what in the project.
-\item
-  References--Citation style is your choice, but all sources should be
-  documented (both in text and in the References section). This includes
-  where you got your data.
-\item
-  A commented Code Appendix
-\end{itemize}
-
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\#?????}
 \NormalTok{cirrhosis }\SpecialCharTok{\%\textgreater{}\%} 
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ N\_Days)) }\SpecialCharTok{+} \FunctionTok{geom\_histogram}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{facet\_wrap}\NormalTok{(}\AttributeTok{facets =} \FunctionTok{vars}\NormalTok{(Status))}
@@ -349,7 +364,7 @@ A link to the original study is here:
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 \end{verbatim}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-3-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -361,12 +376,12 @@ A link to the original study is here:
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{eda}{%
-\section{EDA}\label{eda}}
+\hypertarget{exploratory-data-analysis}{%
+\section{Exploratory Data Analysis}\label{exploratory-data-analysis}}
 
-\hypertarget{exploring-the-demographics-of-the-patients}{%
-\subsection{Exploring the demographics of the
-patients}\label{exploring-the-demographics-of-the-patients}}
+\hypertarget{part-1-exploring-the-demographics-of-the-patients}{%
+\subsection{Part 1: Exploring the demographics of the
+patients}\label{part-1-exploring-the-demographics-of-the-patients}}
 
 \hypertarget{sex-ratio-of-patients}{%
 \subsubsection{Sex Ratio of Patients}\label{sex-ratio-of-patients}}
@@ -395,7 +410,7 @@ patients}\label{exploring-the-demographics-of-the-patients}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-5-1.pdf}
 
 Primary Biliary Cholangitis affects women much more than men at a 10-1
 ratio. The data of this clinical study mimics the greater population.
@@ -422,13 +437,13 @@ Patients}\label{age-distribution-of-patients}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-12-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-6-1.pdf}
 
 The distribution of ages is quite normal.
 
-\hypertarget{looking-at-the-data-itself}{%
-\subsection{Looking at the data
-itself}\label{looking-at-the-data-itself}}
+\hypertarget{part-2-looking-at-the-data-itself}{%
+\subsection{Part 2: Looking at the data
+itself}\label{part-2-looking-at-the-data-itself}}
 
 \hypertarget{na-counts-amongst-our-variables}{%
 \subsubsection{NA counts amongst our
@@ -488,8 +503,8 @@ Age\_Years & 0\\
 \end{tabular}
 
 An observation is that many of the variables have 106 NAs. This
-indicates that a good fraction {[}106 patients{]} were equally tracked
-and measured in a less extensive way.
+indicates that a good fraction {[}106 patients{]} could have been
+equally tracked and measured in a less extensive way.
 
 \hypertarget{distribution-of-stages-of-biliary-cholangitis}{%
 \subsection{Distribution of Stages of Biliary
@@ -502,14 +517,14 @@ Cholangitis}\label{distribution-of-stages-of-biliary-cholangitis}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-8-1.pdf}
 
 This distribution is left skewed and not symmetric. Most patients have
 stage 3 and then 4 of Biliary Cholangitis.
 
-\hypertarget{exploring-some-interactions-of-variables}{%
-\subsection{Exploring some interactions of
-variables}\label{exploring-some-interactions-of-variables}}
+\hypertarget{part-3-exploring-some-interactions-of-variables}{%
+\subsection{Part 3: Exploring some interactions of
+variables}\label{part-3-exploring-some-interactions-of-variables}}
 
 \hypertarget{how-does-prescense-of-a-d-penicillamine-with-stage-of-biliary-cholangitis-impact-number-of-days-till-death}{%
 \subsubsection{How does prescense of a D-penicillamine with stage of
@@ -522,7 +537,7 @@ death?}\label{how-does-prescense-of-a-d-penicillamine-with-stage-of-biliary-chol
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-15-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-9-1.pdf}
 
 This heat map shows that being a placebo in stage 1 gives you a greater
 amount of days till death in this sample of patients.
@@ -551,7 +566,7 @@ drug}\label{individuals-with-edema-and-if-they-were-on-the-drug}}
 ## generated.
 \end{verbatim}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-10-1.pdf}
 
 Edema is swelling due to too much liquid trapped in the body's tissues.
 It's common complication in liver diseases and can significantly impact
@@ -563,10 +578,6 @@ the graph we can see a even split between the placebo and drug for Edema
 status. There is no NA values for Edema persistent despite diuretics. We
 cannot directly compare it the splits for other statuses given their NA
 values if known could change the look of the graph.
-
-\hypertarget{mihir-choose-your-preffered-graph-and-explain}{%
-\subsubsection{mihir choose your preffered graph and
-explain}\label{mihir-choose-your-preffered-graph-and-explain}}
 
 \hypertarget{survival-analysis-based-on-treatment-and-stage-how-does-the-survival-rate-differ-among-patients-at-different-stages-of-pbc-who-received-d-penicillamine-versus-placebo}{%
 \subsubsection{Survival Analysis Based on Treatment and Stage: How does
@@ -580,7 +591,6 @@ survival rates across different disease stages and treatment types, we
 can assess the drug's effectiveness at various disease stages. This
 information is vital for clinicians to make informed decisions about
 treatment plans and for researchers to understand the drug's impact.
-(LOLL this is what the study acc sought to discover)
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -596,7 +606,7 @@ treatment plans and for researchers to understand the drug's impact.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-17-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 \hypertarget{impact-of-liver-complications-on-survival-how-do-the-presence-of-ascites-hepatomegaly-and-spiders-relate-to-survival-time}{%
 \subsubsection{Impact of Liver Complications on Survival: How do the
@@ -622,7 +632,7 @@ function.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-18-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-12-1.pdf}
 
 \hypertarget{correlation-between-biochemical-markers-and-disease-stage-what-is-the-correlation-between-biochemical-markers-bilirubin-cholesterol-albumin-copper-alk_phos-sgot-triglycerides-and-the-histologic-stage-of-the-disease}{%
 \subsubsection{Correlation between Biochemical Markers and Disease
@@ -636,9 +646,10 @@ correlate with the disease's progression. Such correlations can aid in
 the early detection of disease severity, help in monitoring the disease
 progression, and potentially guide treatment adjustments.
 
-\hypertarget{part-i-classification-algorithm-for-the-status-of-the-patient}{%
-\section{Part I: Classification Algorithm for the Status of the
-Patient}\label{part-i-classification-algorithm-for-the-status-of-the-patient}}
+\hypertarget{part-i-classification-algorithm-for-the-status-of-the-patient-using-cart}{%
+\section{Part I: Classification Algorithm for the Status of the Patient
+using
+CART}\label{part-i-classification-algorithm-for-the-status-of-the-patient-using-cart}}
 
 To address the first sub-goal of this project, we will be exploring the
 prediction of the status of a patient at the end of the study. Our main
@@ -744,9 +755,9 @@ performance.
 There are useful packages to build decision trees in R: the \{tree\} and
 the \{rpart\} (recursive partitioning) packages.
 
-In this report, I have decided to use \{rpart\} because it provides more
-flexibility for surrogate splits and the trees are a bit easier to make
-attractive looking.
+In this report, we have decided to use \{rpart\} because it provides
+more flexibility for surrogate splits and the trees are a bit easier to
+make attractive looking.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -784,11 +795,11 @@ The following is a basic diagram for the tree that was just grown.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-22-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-16-1.pdf}
 
-(Explanation of above) To gain a further understanding of the data, we
-can plot a tree yielding Collection Node style trees. This can help us
-understand how the data is split.
+To gain a further understanding of the data, we can plot a tree yielding
+Collection Node style trees. This can help us understand how the data is
+split.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -817,7 +828,10 @@ understand how the data is split.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-23-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+The tree shows us the splits that were done on Age, Bilirubin and
+Prothrombin. Interestingly, Stage did not contribute in the tree.
 
 \hypertarget{part-3-pruning-the-tree}{%
 \subsubsection{Part 3: Pruning the tree}\label{part-3-pruning-the-tree}}
@@ -875,9 +889,9 @@ tree and the x-val relative error.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-25-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-19-1.pdf}
 
-From the graph we can see that a cp of 0.011 is ideal as it is under the
+From the graph we can see that a cp of 0.039 is ideal as it is under the
 horizontal (dotted) reference line. We can prune the tree with this CP
 value.
 
@@ -903,7 +917,10 @@ We can plot the pruned tree
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-27-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-21-1.pdf}
+
+We ca see the pruned tree has cut out some leaf nodes. This would help
+in avoiding overfitting the model.
 
 \hypertarget{part-4-results}{%
 \subsubsection{Part 4: Results}\label{part-4-results}}
@@ -990,7 +1007,7 @@ We can evaluate the results of this through a confusion matrix.
   \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Prediction/Supervision"}\NormalTok{, }\StringTok{"0"}\NormalTok{, }\StringTok{"1"}\NormalTok{),}
   \AttributeTok{digits =} \DecValTok{3}\NormalTok{,}
   \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{,}
-  \AttributeTok{caption =} \StringTok{"Model 1: Confusion Matrix"}\NormalTok{,}
+  \AttributeTok{caption =} \StringTok{"Model 1: Confusion Matrix (0=Deceased, 1=Censored)"}\NormalTok{,}
   \AttributeTok{align =} \StringTok{"c"}
 \NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
 \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \StringTok{"HOLD\_position"}\NormalTok{)}
@@ -999,7 +1016,7 @@ We can evaluate the results of this through a confusion matrix.
 
 \begin{table}[H]
 
-\caption{\label{tab:unnamed-chunk-29}Model 1: Confusion Matrix}
+\caption{\label{tab:unnamed-chunk-23}Model 1: Confusion Matrix (0=Deceased, 1=Censored)}
 \centering
 \begin{tabular}[t]{lcc}
 \toprule
@@ -1061,24 +1078,7 @@ Prediction/Supervision & 0 & 1\\
 \end{Highlighting}
 \end{Shaded}
 
-From this, we can get the model's
-
-\begin{itemize}
-\item
-  True Positive (TP): Predicted Graduated and actually Graduated. In
-  this case, 2217
-\item
-  False Positive (FP): Predicted Graduated but actually Not Graduated.
-  In this case, 1000
-\item
-  False Negative (FN): Predicted Not Graduated but actually Graduated.
-  In this case, 244
-\item
-  True Negative (TN): Predicted Not Graduated and actually Not
-  Graduated. In this case, 659
-\end{itemize}
-
-With this, we can also calculate the model's metrics.
+With this, we can also calculate the model's metrics on the test data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1106,6 +1106,10 @@ model & accuracy & sensitivity & specificity\\
 rpart2\_pred & 0.729 & 0.827 & 0.576\\
 \bottomrule
 \end{tabular}
+
+As you can see the model shows good accuracy with 72.9\%. However, the
+specificity is an issue with 57.6\%. Now let us compare this with a
+different type of model: logistic regression.
 
 \hypertarget{part-ii-exploring-the-predictors-for-the-patients-status-using-logistic-regression}{%
 \section{Part II: Exploring the predictors for the patient's status
@@ -1595,7 +1599,7 @@ We can also plot the confusion matrix for this model:
 
 \begin{table}[H]
 
-\caption{\label{tab:unnamed-chunk-36}Model 1 Confusion Matrix}
+\caption{\label{tab:unnamed-chunk-30}Model 1 Confusion Matrix}
 \centering
 \begin{tabular}[t]{ccc}
 \toprule
@@ -1655,15 +1659,14 @@ Copper & -0.0038998 & 9.961078e-01 & 0.0027552 & -1.4154168 & 0.1569463\\
 \hline
 \end{tabular}
 
-This analysis suggests significant associations between several
-predictors (Bilirubin, Age, Alk\_Phos, Prothrombin, Spiders) and the
-status of the patient. Each predictor, including the Intercept, shows a
-statistically significant effect, as indicated by their small p-values
-(Pr(\textgreater\textbar z\textbar)). The negative coefficients for
-Bilirubin, Age, Alk\_Phos, Prothrombin, and Spiders imply that increases
-in these variables are associated with a decrease in the log-odds of the
-outcome. Bilirubin and Spiders are showing notably strong effects in the
-model.
+This is the role of inference in evaluating our model. The most notable
+predictors are Bilirubin, Age, Alk\_Phos, and Prothrombin, each showing
+a statistically significant relationship (p \textless{} 0.05) with the
+dependent variable. The Intercept and EdemaY have extremely significant
+p-values, but the practical significance of EdemaY is questionable due
+to its large standard error. Other variables like Spiders, SGOT,
+DrugPlacebo, and Copper, while contributing to the model, do not reach
+conventional levels of statistical significance (p \textless{} 0.05).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1691,13 +1694,13 @@ model.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-38-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-32-1.pdf}
 
 This figure shows us the Tukey-Anscombe plot using Pearson residuals for
 Model 2. In an ideal fit, the residuals should be evenly distributed
 about zero with constant mean and variance. The shape of the line
 suggests that the model is not capturing someunder lying structure in
-the data, especially in extreme cases.
+the datain extreme cases.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1754,7 +1757,7 @@ reliability of the model.
 
 \begin{table}[H]
 
-\caption{\label{tab:unnamed-chunk-40}Confusion matrix for Model 2}
+\caption{\label{tab:unnamed-chunk-34}Confusion matrix for Model 2}
 \centering
 \begin{tabular}[t]{l|r|r}
 \hline
@@ -1930,7 +1933,7 @@ Lastly, let us look at the separation plots for each of the models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-42-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-36-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1949,7 +1952,7 @@ Lastly, let us look at the separation plots for each of the models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-43-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-37-1.pdf}
 
 The separation plot assesses the the fit of the model by providing the
 model's ability to predict occurrences with a high probability and
@@ -1959,7 +1962,7 @@ in predicting the patient's status, especially for the observations on
 the left-most side of the plot compared to Model 1 with the training
 data. We will later compare this graph with the testing data.
 
-Lastly, let us look at the ROC curves for bothe the models.
+Lastly, let us look at the ROC curves for both the models.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1997,21 +2000,35 @@ Lastly, let us look at the ROC curves for bothe the models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-45-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-39-1.pdf}
 
 From the graphs we can interpret that:
 
-Model 1: - Its ROC curve is above the line of no discrimination,
-indicating that the model has some predictive capabilities. - The AUC is
-0.64, which is better than random guessing but suggests there's room for
-improvement.
+Model 1:
 
-Model 2: - The ROC curve for Model 2 is significantly above that of
-Model 1, and much closer to the top-left corner, indicating better
-predictive performance. - The AUC is 0.899, which suggests a good
-classification performance, and it's notably better than Model 1. - Its
-ability to discriminate between positive and negative classes is
-superior to that of Model 1.
+\begin{itemize}
+\item
+  Its ROC curve is above the line of no discrimination, indicating that
+  the model has some predictive capabilities
+\item
+  The AUC is 0.638, which is better than random guessing but suggests
+  there's room for improvement.
+\end{itemize}
+
+Model 2:
+
+\begin{itemize}
+\item
+  The ROC curve for Model 2 is significantly above that of Model 1, and
+  much closer to the top-left corner, indicating better predictive
+  performance.
+\item
+  The AUC is 0.899, which suggests a good classification performance,
+  and it's notably better than Model 1.
+\item
+  Its ability to discriminate between positive and negative classes is
+  superior to that of Model 1.
+\end{itemize}
 
 Lastly, let us plot our influence plot.
 
@@ -2022,7 +2039,7 @@ Lastly, let us plot our influence plot.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-46-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-40-1.pdf}
 
 The influence plot shows several data points with high leverage and
 large residuals, indicating potential outliers. Some observations,
@@ -2033,7 +2050,7 @@ regression model due to their Cook's D values.
 \section{Testing our model}\label{testing-our-model}}
 
 Using our final model, we now turn to see how well this classifier does
-on our testing data. Recall that we initally set the test data during
+on our testing data. Recall that we initially set the test data during
 the train test split.
 
 The confusion matrix below shows the performance of our model using the
@@ -2085,7 +2102,7 @@ naïve decision rule.
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-48}Confusion Matrix for Test data}
+\caption{\label{tab:unnamed-chunk-42}Confusion Matrix for Test data}
 \centering
 \begin{tabular}[t]{l|r|r}
 \hline
@@ -2111,8 +2128,10 @@ Deceased & 3 & 10\\
 
 This shows that our model is has struggled with overfitting, with an
 especially low precision score. We will discuss this in the comparison
-with the tree model, but this is a limitation of our data size. Lastly,
-we can plot the separation plot.
+with the tree model, but this is an importnat limitation of our data
+size as we discussed in the introduction. Lastly, we can plot the
+separation plot. We can see the separation has increased due to the over
+fitting we discussed.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2130,7 +2149,12 @@ we can plot the separation plot.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-49-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-43-1.pdf}
+
+\#Comparison between models
+
+Now let us compare the performance of our logistic regression model with
+a decision tree model. We will use the same train test split as before.
 
 \hypertarget{part-iii-exploring-the-sub-clusters-of-the-cirrhosis-data-using-unsupervised-learning}{%
 \section{Part III: Exploring the sub-clusters of the cirrhosis data
@@ -2189,6 +2213,7 @@ formats, which is necessary for clustering algorithms.
 \begin{Highlighting}[]
 \CommentTok{\#do the ml, take about observational stages vs now quantify, look into the different variables and what they mean.}
 \NormalTok{cirrhosisCluster }\OtherTok{\textless{}{-}}\NormalTok{ cirrhosis}
+\NormalTok{cirrhosisCluster2 }\OtherTok{\textless{}{-}} \FunctionTok{na.omit}\NormalTok{(cirrhosis)}
 
 \NormalTok{cirrhosisCluster }\OtherTok{\textless{}{-}}\NormalTok{ cirrhosisCluster }\SpecialCharTok{\%\textgreater{}\%}                 
 \NormalTok{                                  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{Stage)     }
@@ -2291,7 +2316,7 @@ first step was making a color palette and plotting the dendrogram tree.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-54-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-48-1.pdf}
 
 As, you can see, the model was able to create clear clusters for the
 data. However, it is important to find the best value of k to get the
@@ -2314,7 +2339,7 @@ corresponds to the "elbow".
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-55-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-49-1.pdf}
 
 From this, we identified that 5 was the ideal value of k, where the
 Total Within {[}Cluster{]} Sums of Squares begins leveling off. Let us
@@ -2359,7 +2384,7 @@ with a format more easy to visualize.
 ## generated.
 \end{verbatim}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-57-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-51-1.pdf}
 
 As you can see, the 5 clusters were identified, which are color coded in
 our updated diagram.
@@ -2383,7 +2408,7 @@ where k = 4
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-58-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-52-1.pdf}
 
 We can also plot our refined model, as you can see the plot below
 identifies 5 clear clusters.
@@ -2404,6 +2429,96 @@ identifies 5 clear clusters.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Submission_files/figure-latex/unnamed-chunk-59-1.pdf}
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-53-1.pdf}
+
+Now we can go back to our initial goal: comparing how the custers
+compare to the Stage variable
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cirrhosisCluster2}\SpecialCharTok{$}\NormalTok{cluster }\OtherTok{\textless{}{-}}\NormalTok{ hybridCirrhosis}\SpecialCharTok{$}\NormalTok{cluster}
+\CommentTok{\# Calculate mean (or median, etc.) for each variable in each cluster}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\NormalTok{cluster\_summary }\OtherTok{\textless{}{-}}\NormalTok{ cirrhosisCluster2 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(cluster) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise\_all}\NormalTok{(}\FunctionTok{funs}\NormalTok{(}\FunctionTok{mean}\NormalTok{(., }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))) }\CommentTok{\# Replace mean with median or any other function as necessary}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: `funs()` was deprecated in dplyr 0.8.0.
+## i Please use a list of either functions or lambdas:
+## 
+## # Simple named list: list(mean = mean, median = median)
+## 
+## # Auto named with `tibble::lst()`: tibble::lst(mean, median)
+## 
+## # Using lambdas list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: There were 20 warnings in `summarise()`.
+## The first warning was:
+## i In argument: `Status = mean(Status, na.rm = TRUE)`.
+## i In group 1: `cluster = 1`.
+## Caused by warning in `mean.default()`:
+## ! argument is not numeric or logical: returning NA
+## i Run `dplyr::last_dplyr_warnings()` to see the 19 remaining warnings.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{kable}\NormalTok{(cluster\_summary }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{Status, }\SpecialCharTok{{-}}\NormalTok{Drug, }\SpecialCharTok{{-}}\NormalTok{ Sex, }\SpecialCharTok{{-}}\NormalTok{Edema, }\SpecialCharTok{{-}}\NormalTok{Stage), }\AttributeTok{label =} \StringTok{"Cluster Summary"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{tabular}{r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r}
+\hline
+cluster & N\_Days & Age & Ascites & Hepatomegaly & Spiders & Bilirubin & Cholesterol & Albumin & Copper & Alk\_Phos & SGOT & Tryglicerides & Platelets & Prothrombin & Age\_Years\\
+\hline
+1 & 1475.862 & 23503.95 & 0.1724138 & 0.5517241 & 0.3103448 & 4.034483 & 327.0862 & 3.337069 & 107.77586 & 1492.241 & 120.0178 & 126.7414 & 248.3276 & 11.15517 & 64.35030\\
+\hline
+2 & 2579.950 & 18505.65 & 0.1000000 & 0.6500000 & 0.3500000 & 4.275000 & 376.3500 & 3.372000 & 149.15000 & 8394.200 & 136.8590 & 145.4000 & 263.0500 & 10.98500 & 50.66571\\
+\hline
+3 & 2074.659 & 13933.03 & 0.0227273 & 0.4204545 & 0.2954545 & 2.842045 & 426.8977 & 3.629773 & 93.68182 & 1582.877 & 130.9384 & 119.4205 & 281.6591 & 10.46591 & 38.14657\\
+\hline
+4 & 2058.918 & 18734.59 & 0.0454545 & 0.5454545 & 0.2636364 & 3.186364 & 349.1182 & 3.547546 & 93.94545 & 1430.342 & 118.5102 & 124.7818 & 252.7182 & 10.68455 & 51.29251\\
+\hline
+\end{tabular}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(cirrhosisCluster2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{factor}\NormalTok{(cluster), }\AttributeTok{fill =} \FunctionTok{factor}\NormalTok{(Stage))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{position =} \StringTok{"dodge"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Distribution of Stages within Clusters"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Cluster"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Count"}\NormalTok{,}
+       \AttributeTok{fill =} \StringTok{"Stage"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Final-Submission_files/figure-latex/unnamed-chunk-54-1.pdf}
+
+We can see that the clusters are not evenly distributed. This is a good
+sign, as it means that the clusters are not just a random grouping of
+the data.
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+\hypertarget{author-contributions}{%
+\section{Author Contributions}\label{author-contributions}}
+
+\hypertarget{referencescitation-style-is-your-choice-but-all-sources-should-be-documented-both-in-text-and-in-the-references-section.-this-includes-where-you-got-your-data.}{%
+\section{References--Citation style is your choice, but all sources
+should be documented (both in text and in the References section). This
+includes where you got your
+data.}\label{referencescitation-style-is-your-choice-but-all-sources-should-be-documented-both-in-text-and-in-the-references-section.-this-includes-where-you-got-your-data.}}
+
+\hypertarget{code-appendix}{%
+\section{Code Appendix}\label{code-appendix}}
 
 \end{document}

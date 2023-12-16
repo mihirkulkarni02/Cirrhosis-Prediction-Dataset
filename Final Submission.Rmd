@@ -1,16 +1,26 @@
 ---
-title: "Final Project Report: An exploration of Biliary Cirrhosis and Treatments"
-output: html_notebook
-authors: "Mihir Kulkarni, Nithika Menon"
+title: 'Final Project Report - A statistical exploration of Biliary Cirrhosis and Treatments'
+output:
+  pdf_document: default
+authors: Mihir Kulkarni+Nithika Menon
 ---
 
+```{r setupFiles, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center"
+)
+```
+
 # Background
+
+![[Primary biliary cholangitis (Source:]{.underline} <https://www.mayoclinic.org/diseases-conditions/primary-biliary-cholangitis/symptoms-causes/syc-20376874>)](ds00604_-ds00918_im02271_r7_biliarysystemthu_jpg.jpg)
 
 ## What is Biliary Cholangitis?
 
 Primary Biliary Cholangitis (previously called Primary Biliary Cirrhosis) is an autoimmune disease where bile ducts become swollen and inflamed and block the flow of bile. Bile is a substance that aids with digestion. The bile ducts carry bile from the liver to the small intestine. The swelling and inflammation can lead to scarring of the liver which is cirrhosis. Advanced cirrhosis can lead to liver failure or liver cancer. Medication can slow progression. There is no definite cure at this time.
-
-![[Primary Biliary Cholangitis ([Source](https://www.google.com/search?client=safari&sca_esv=591276386&rls=en&sxsrf=AM9HkKmtJVOC2Jrf2BSYVB2O-QcnTSgx6g:1702664705100&q=Primary+Biliary+Cholangitis&tbm=isch&source=lnms&sa=X&ved=2ahUKEwid0qyniJKDAxX9FFkFHVH3CcoQ0pQJegQIDxAB&biw=1440&bih=848&dpr=2#imgrc=UeV_fhP-8vPOlM))]{.underline}](17715-primary-biliary-cholangitis.webp)
 
 ## Why is the data important to us?
 
@@ -32,15 +42,15 @@ The dataset is produced from a clinical study by Mayo Clinic run from 1974-1984.
 
 The data contains the following attributes ([Data Source](https://www.kaggle.com/datasets/fedesoriano/cirrhosis-prediction-dataset/data)):
 
-1) **ID**: unique identifier\
-2) **N_Days**: number of days between registration and the earlier of death, transplantation, or study analysis time in July 1986\
-3) **Status**: status of the patient C (censored), CL (censored due to liver tx), or D (death)\
-4) **Drug**: type of drug D-penicillamine or placebo\
-5) **Age**: age in [days]\
-6) **Sex**: M (male) or F (female)\
-7) **Ascites**: presence of ascites N (No) or Y (Yes)\
-8) **Hepatomegaly**: presence of hepatomegaly N (No) or Y (Yes)\
-9) **Spiders**: presence of spiders N (No) or Y (Yes)\
+1)  **ID**: unique identifier\
+2)  **N_Days**: number of days between registration and the earlier of death, transplantation, or study analysis time in July 1986\
+3)  **Status**: status of the patient C (censored), CL (censored due to liver tx), or D (death)\
+4)  **Drug**: type of drug D-penicillamine or placebo\
+5)  **Age**: age in [days]\
+6)  **Sex**: M (male) or F (female)\
+7)  **Ascites**: presence of ascites N (No) or Y (Yes)\
+8)  **Hepatomegaly**: presence of hepatomegaly N (No) or Y (Yes)\
+9)  **Spiders**: presence of spiders N (No) or Y (Yes)\
 10) **Edema**: presence of edema N (no edema and no diuretic therapy for edema), S (edema present without diuretics, or edema resolved by diuretics), or Y (edema despite diuretic therapy)\
 11) **Bilirubin**: serum bilirubin in [mg/dl]\
 12) **Cholesterol**: serum cholesterol in [mg/dl]\
@@ -93,7 +103,6 @@ cirrhosis$Sex <- factor(ifelse(cirrhosis$Sex == 0, "Female", "Male"))
 #Drop the first column
 cirrhosis <- cirrhosis[,-1]
 ```
-
 
 ```{r}
 #?????
@@ -1116,7 +1125,7 @@ hkmeans_tree(
 
 ```
 
-As, you can see, the model was able to create clear clusters for the data. However, it is important to find the best value of k to get the optimal clusters. To do this we can use a scree plot. Here, we\'re looking for the number of clusters that corresponds to the \"elbow\".
+As, you can see, the model was able to create clear clusters for the data. However, it is important to find the best value of k to get the optimal clusters. To do this we can use a scree plot. Here, we're looking for the number of clusters that corresponds to the "elbow".
 
 ```{r}
 # Create scree plot for choosing k ----
@@ -1229,4 +1238,12 @@ We can see that the clusters are not evenly distributed. This is a good sign, as
 
 # References--Citation style is your choice, but all sources should be documented (both in text and in the References section). This includes where you got your data.
 
+\newpage
+
 # Code Appendix
+
+```{r codeAppendix}
+#| ref.label = knitr::all_labels(),
+#| echo = TRUE,
+#| eval = FALSE
+```
